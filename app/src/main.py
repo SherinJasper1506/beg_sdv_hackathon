@@ -67,25 +67,63 @@ class SampleApp(VehicleApp):
         # This method will be called by the SDK when the connection to the
         # Vehicle DataBroker is ready.
         # Here you can subscribe for the Vehicle Signals update (e.g. Vehicle Speed).
-        await self.Vehicle.Acceleration.Lateral.subscribe(self.on_accel_change)
-        await self.Vehicle.Acceleration.Longitudinal.subscribe(self.on_accel_change)
-        await self.Vehicle.Acceleration.Vertical.subscribe(self.on_accel_change)
+        await self.Vehicle.Acceleration.Lateral.subscribe(self.on_accel_lat_change)
+        await self.Vehicle.Acceleration.Longitudinal.subscribe(
+            self.on_accel_long_change
+        )
+        await self.Vehicle.Acceleration.Vertical.subscribe(self.on_accel_vert_change)
         await self.Vehicle.Speed.subscribe(self.on_speed_change)
 
-    async def on_accel_change(self, data: DataPointReply):
+    async def on_accel_lat_change(self, data: DataPointReply):
         accel_lat = data.get(self.Vehicle.Acceleration.Lateral).value
         accel_long = data.get(self.Vehicle.Acceleration.Longitudinal).value
         accel_vert = data.get(self.Vehicle.Acceleration.Vertical).value
-        await self.publish_event(
-            ACCEL_DATABROKER_SUBSCRIPTION_TOPIC,
-            json.dumps(
-                {
-                    "accel_lat": accel_lat,
-                    "accel_long": accel_long,
-                    "accel_vert": accel_vert,
-                }
-            ),
-        )
+
+        if accel_lat > 1:
+            await self.publish_event(
+                ACCEL_DATABROKER_SUBSCRIPTION_TOPIC,
+                json.dumps(
+                    {
+                        "accel_lat": accel_lat,
+                        "accel_long": accel_long,
+                        "accel_vert": accel_vert,
+                    }
+                ),
+            )
+
+    async def on_accel_long_change(self, data: DataPointReply):
+        accel_lat = data.get(self.Vehicle.Acceleration.Lateral).value
+        accel_long = data.get(self.Vehicle.Acceleration.Longitudinal).value
+        accel_vert = data.get(self.Vehicle.Acceleration.Vertical).value
+
+        if accel_long > 1:
+            await self.publish_event(
+                ACCEL_DATABROKER_SUBSCRIPTION_TOPIC,
+                json.dumps(
+                    {
+                        "accel_lat": accel_lat,
+                        "accel_long": accel_long,
+                        "accel_vert": accel_vert,
+                    }
+                ),
+            )
+
+    async def on_accel_vert_change(self, data: DataPointReply):
+        accel_lat = data.get(self.Vehicle.Acceleration.Lateral).value
+        accel_long = data.get(self.Vehicle.Acceleration.Longitudinal).value
+        accel_vert = data.get(self.Vehicle.Acceleration.Vertical).value
+
+        if accel_vert > 1:
+            await self.publish_event(
+                ACCEL_DATABROKER_SUBSCRIPTION_TOPIC,
+                json.dumps(
+                    {
+                        "accel_lat": accel_lat,
+                        "accel_long": accel_long,
+                        "accel_vert": accel_vert,
+                    }
+                ),
+            )
 
     async def on_speed_change(self, data: DataPointReply):
         """The on_speed_change callback, this will be executed when receiving a new
@@ -139,22 +177,15 @@ class SampleApp(VehicleApp):
         """The subscribe_topic annotation is used to subscribe for incoming
         PubSub events, e.g. MQTT event for GET_ACCEL_REQUEST_TOPIC.
         """
-
-        # Use the logger with the preferred log level (e.g. debug, info, error, etc)
         logger.debug(
             "PubSub event for the Topic: %s -> is received with the data: %s",
             GET_ACCEL_REQUEST_TOPIC,
             data,
         )
-
-        # Getting current speed from VehicleDataBroker using the DataPoint getter.
         accel_lat = (await self.Vehicle.Acceleration.Lateral.get()).value
         accel_long = (await self.Vehicle.Acceleration.Longitudinal.get()).value
         accel_vert = (await self.Vehicle.Acceleration.Vertical.get()).value
 
-        # Do anything with the speed value.
-        # Example:
-        # - Publishes the vehicle speed to MQTT topic (i.e. GET_SPEED_RESPONSE_TOPIC).
         await self.publish_event(
             GET_ACCEL_RESPONSE_TOPIC,
             json.dumps(
