@@ -168,8 +168,6 @@ class SampleApp(VehicleApp):
         """The subscribe_topic annotation is used to subscribe for incoming
         PubSub events, e.g. MQTT event for GET_ACCEL_REQUEST_TOPIC.
         """
-
-        # Use the logger with the preferred log level (e.g. debug, info, error, etc)
         logger.debug(
             "PubSub event for the Topic: %s -> is received with the data: %s",
             GET_ACCEL_REQUEST_TOPIC,
@@ -178,12 +176,9 @@ class SampleApp(VehicleApp):
 
         # Getting current speed from VehicleDataBroker using the DataPoint getter.
         self.accel_lat = (await self.Vehicle.Acceleration.Lateral.get()).value
-        accel_long = (await self.Vehicle.Acceleration.Longitudinal.get()).value
-        accel_vert = (await self.Vehicle.Acceleration.Vertical.get()).value
+        self.accel_long = (await self.Vehicle.Acceleration.Longitudinal.get()).value
+        self.accel_vert = (await self.Vehicle.Acceleration.Vertical.get()).value
 
-        # Do anything with the speed value.
-        # Example:
-        # - Publishes the vehicle speed to MQTT topic (i.e. GET_SPEED_RESPONSE_TOPIC).
         await self.publish_event(
             GET_ACCEL_RESPONSE_TOPIC,
             json.dumps(
