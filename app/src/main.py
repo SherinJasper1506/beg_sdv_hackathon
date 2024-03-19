@@ -61,28 +61,57 @@ class SampleApp(VehicleApp):
         # SampleApp inherits from VehicleApp.
         super().__init__()
         self.Vehicle = vehicle_client
+        self.accel_lat = 0
+        self.accel_long = 0
+        self.accel_vert = 0
 
     async def on_start(self):
         """Run when the vehicle app starts"""
         # This method will be called by the SDK when the connection to the
         # Vehicle DataBroker is ready.
         # Here you can subscribe for the Vehicle Signals update (e.g. Vehicle Speed).
-        await self.Vehicle.Acceleration.Lateral.subscribe(self.on_accel_change)
-        await self.Vehicle.Acceleration.Longitudinal.subscribe(self.on_accel_change)
-        await self.Vehicle.Acceleration.Vertical.subscribe(self.on_accel_change)
+        await self.Vehicle.Acceleration.Lateral.subscribe(self.on_accel_change_lat)
+        await self.Vehicle.Acceleration.Longitudinal.subscribe(
+            self.on_accel_change_long
+        )
+        await self.Vehicle.Acceleration.Vertical.subscribe(self.on_accel_change_vert)
         await self.Vehicle.Speed.subscribe(self.on_speed_change)
 
-    async def on_accel_change(self, data: DataPointReply):
-        accel_lat = data.get(self.Vehicle.Acceleration.Lateral).value
-        accel_long = data.get(self.Vehicle.Acceleration.Longitudinal).value
-        accel_vert = data.get(self.Vehicle.Acceleration.Vertical).value
+    async def on_accel_change_lat(self, data: DataPointReply):
+        self.accel_lat = data.get(self.Vehicle.Acceleration.Lateral).value
         await self.publish_event(
             ACCEL_DATABROKER_SUBSCRIPTION_TOPIC,
             json.dumps(
                 {
-                    "accel_lat": accel_lat,
-                    "accel_long": accel_long,
-                    "accel_vert": accel_vert,
+                    "accel_lat": self.accel_lat,
+                    "accel_long": self.accel_long,
+                    "accel_vert": self.accel_vert,
+                }
+            ),
+        )
+
+    async def on_accel_change_long(self, data: DataPointReply):
+        self.accel_long = data.get(self.Vehicle.Acceleration.Longitudinal).value
+        await self.publish_event(
+            ACCEL_DATABROKER_SUBSCRIPTION_TOPIC,
+            json.dumps(
+                {
+                    "accel_lat": self.accel_lat,
+                    "accel_long": self.accel_long,
+                    "accel_vert": self.accel_vert,
+                }
+            ),
+        )
+
+    async def on_accel_change_vert(self, data: DataPointReply):
+        self.accel_vert = data.get(self.Vehicle.Acceleration.Vertical).value
+        await self.publish_event(
+            ACCEL_DATABROKER_SUBSCRIPTION_TOPIC,
+            json.dumps(
+                {
+                    "accel_lat": self.accel_lat,
+                    "accel_long": self.accel_long,
+                    "accel_vert": self.accel_vert,
                 }
             ),
         )
@@ -148,7 +177,7 @@ class SampleApp(VehicleApp):
         )
 
         # Getting current speed from VehicleDataBroker using the DataPoint getter.
-        accel_lat = (await self.Vehicle.Acceleration.Lateral.get()).value
+        self.accel_lat = (await self.Vehicle.Acceleration.Lateral.get()).value
         accel_long = (await self.Vehicle.Acceleration.Longitudinal.get()).value
         accel_vert = (await self.Vehicle.Acceleration.Vertical.get()).value
 
@@ -161,7 +190,7 @@ class SampleApp(VehicleApp):
                 {
                     "result": {
                         "status": 0,
-                        "message": f"""Accel Lat = {accel_lat},Accel Long = {accel_long},Accel Vert = {accel_vert}""",
+                        "message": f"""Accel Lat = {self.accel_lat},Accel Long = {accel_long},Accel Vert = {accel_vert}""",
                     },
                 }
             ),
