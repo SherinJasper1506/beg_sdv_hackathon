@@ -19,9 +19,12 @@ import json
 import logging
 import signal
 
+from aws_connecter import AwsConnector
 from vehicle import Vehicle, vehicle  # type: ignore
 from velocitas_sdk.util.log import (  # type: ignore
-    get_opentelemetry_log_factory, get_opentelemetry_log_format)
+    get_opentelemetry_log_factory,
+    get_opentelemetry_log_format,
+)
 from velocitas_sdk.vdb.reply import DataPointReply
 from velocitas_sdk.vehicle_app import VehicleApp, subscribe_topic
 
@@ -62,6 +65,7 @@ class SampleApp(VehicleApp):
         self.accel_lat = 0
         self.accel_long = 0
         self.accel_vert = 0
+        self.aws_connector = AwsConnector()
 
     async def on_start(self):
         """Run when the vehicle app starts"""
