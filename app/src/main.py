@@ -18,7 +18,9 @@ import asyncio
 import json
 import logging
 import signal
+from datetime import datetime
 
+import requests
 from vehicle import Vehicle, vehicle  # type: ignore
 from velocitas_sdk.util.log import (  # type: ignore
     get_opentelemetry_log_factory,
@@ -58,6 +60,20 @@ class SampleApp(VehicleApp):
         self.gps_lat = 0
         self.gps_long = 0
 
+    def post_to_firebase(self, latitude, longitude, accelerometer_vert_value):
+        timestamp = round(datetime.now().timestamp() * 1000)
+        url = (
+            "https://maps-firebase-project-default-rtdb.asia-southeast1.firebasedatabase.app/clicks/"
+            + str(timestamp)
+            + ".json"
+        )
+        payload = json.dumps(
+            {"lat": latitude, "lng": longitude, "weight": accelerometer_vert_value}
+        )
+        r = requests.put(url, data=payload)
+        print(r)
+        return r.status_code
+
     async def on_start(self):
         """Run when the vehicle app starts"""
         # This method will be called by the SDK when the connection to the
@@ -70,7 +86,7 @@ class SampleApp(VehicleApp):
         await self.Vehicle.Acceleration.Vertical.subscribe(self.on_accel_vert_change)
         await self.Vehicle.CurrentLocation.Latitude.subscribe(self.on_gps_lat_change)
         await self.Vehicle.CurrentLocation.Longitude.subscribe(self.on_gps_long_change)
-        await self.Vehicle.Speed.subscribe(self.on_speed_change)
+        # await self.Vehicle.Speed.subscribe(self.on_speed_change)
 
     async def on_gps_lat_change(self, data: DataPointReply):
         self.gps_lat = data.get(self.Vehicle.CurrentLocation.Latitude).value
@@ -120,7 +136,8 @@ class SampleApp(VehicleApp):
 
     async def on_accel_vert_change(self, data: DataPointReply):
         self.accel_vert = data.get(self.Vehicle.Acceleration.Vertical).value
-        if self.accel_vert > 9:
+        if self.accel_vert > 1:
+            self.post_to_firebase(self.gps_lat, self.gps_long, self.accel_vert)
             await self.publish_event(
                 ACCEL_DATABROKER_SUBSCRIPTION_TOPIC,
                 json.dumps(
