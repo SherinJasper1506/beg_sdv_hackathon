@@ -88,42 +88,51 @@ class SampleApp(VehicleApp):
 
     async def on_accel_lat_change(self, data: DataPointReply):
         self.accel_lat = data.get(self.Vehicle.Acceleration.Lateral).value
-        await self.publish_event(
-            ACCEL_DATABROKER_SUBSCRIPTION_TOPIC,
-            json.dumps(
-                {
-                    "accel_lat": self.accel_lat,
-                    "accel_long": self.accel_long,
-                    "accel_vert": self.accel_vert,
-                }
-            ),
-        )
+        if self.accel_lat > 1:
+            await self.publish_event(
+                ACCEL_DATABROKER_SUBSCRIPTION_TOPIC,
+                json.dumps(
+                    {
+                        "accel_lat": self.accel_lat,
+                        "accel_long": self.accel_long,
+                        "accel_vert": self.accel_vert,
+                        "gps_lat": self.gps_lat,
+                        "gps_long": self.gps_long,
+                    }
+                ),
+            )
 
     async def on_accel_long_change(self, data: DataPointReply):
         self.accel_long = data.get(self.Vehicle.Acceleration.Longitudinal).value
-        await self.publish_event(
-            ACCEL_DATABROKER_SUBSCRIPTION_TOPIC,
-            json.dumps(
-                {
-                    "accel_lat": self.accel_lat,
-                    "accel_long": self.accel_long,
-                    "accel_vert": self.accel_vert,
-                }
-            ),
-        )
+        if self.accel_long > 1:
+            await self.publish_event(
+                ACCEL_DATABROKER_SUBSCRIPTION_TOPIC,
+                json.dumps(
+                    {
+                        "accel_lat": self.accel_lat,
+                        "accel_long": self.accel_long,
+                        "accel_vert": self.accel_vert,
+                        "gps_lat": self.gps_lat,
+                        "gps_long": self.gps_long,
+                    }
+                ),
+            )
 
     async def on_accel_vert_change(self, data: DataPointReply):
         self.accel_vert = data.get(self.Vehicle.Acceleration.Vertical).value
-        await self.publish_event(
-            ACCEL_DATABROKER_SUBSCRIPTION_TOPIC,
-            json.dumps(
-                {
-                    "accel_lat": self.accel_lat,
-                    "accel_long": self.accel_long,
-                    "accel_vert": self.accel_vert,
-                }
-            ),
-        )
+        if self.accel_vert > 9:
+            await self.publish_event(
+                ACCEL_DATABROKER_SUBSCRIPTION_TOPIC,
+                json.dumps(
+                    {
+                        "accel_lat": self.accel_lat,
+                        "accel_long": self.accel_long,
+                        "accel_vert": self.accel_vert,
+                        "gps_lat": self.gps_lat,
+                        "gps_long": self.gps_long,
+                    }
+                ),
+            )
 
     async def on_speed_change(self, data: DataPointReply):
         """The on_speed_change callback, this will be executed when receiving a new

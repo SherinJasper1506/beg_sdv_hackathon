@@ -27,7 +27,22 @@ async def main():
             await inttesthelper.set_double_datapoint(name=signal, value=float(value))
             # have a sleep of 1 sec
             await asyncio.sleep(1)
-    print("published")
+    print("gps data published")
+
+    # Enable if mock values are needed for testing
+
+    # print("Accel Values")
+    # signals, rows = read_csv_and_format(
+    #     "/workspaces/beg_sdv_hackathon/app/mock_data_feeder/accel_data_mock.csv"
+    # )
+    # for row in rows:
+    #     for signal, value in zip(signals, row):
+    #         print(signals)
+    #         print(row)
+    #         await inttesthelper.set_float_datapoint(name=signal, value=float(value))
+    #         # have a sleep of 1 sec
+    #         await asyncio.sleep(1)
+    # print("accel data published")
 
 
 if __name__ == "__main__":
