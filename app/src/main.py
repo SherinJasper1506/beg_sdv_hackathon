@@ -21,6 +21,7 @@ import signal
 from datetime import datetime
 
 import requests
+from aws_connecter import AwsConnector
 from vehicle import Vehicle, vehicle  # type: ignore
 from velocitas_sdk.util.log import (  # type: ignore
     get_opentelemetry_log_factory,
@@ -29,7 +30,6 @@ from velocitas_sdk.util.log import (  # type: ignore
 from velocitas_sdk.vdb.reply import DataPointReply
 from velocitas_sdk.vehicle_app import VehicleApp, subscribe_topic
 
-# Configure the VehicleApp logger with the necessary log config and level.
 logging.setLogRecordFactory(get_opentelemetry_log_factory())
 logging.basicConfig(format=get_opentelemetry_log_format())
 logging.getLogger().setLevel("DEBUG")
@@ -56,7 +56,7 @@ class SampleApp(VehicleApp):
         self.accel_lat = 0
         self.accel_long = 0
         self.accel_vert = 0
-        # self.aws_connector = AwsConnector()
+        self.aws_connector = AwsConnector()
         self.gps_lat = 0
         self.gps_long = 0
 

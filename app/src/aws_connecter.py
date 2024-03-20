@@ -6,9 +6,9 @@ THING_NAME = "docker-test"
 SUBSCRIBE_TOPIC = "downloadStatus/" + THING_NAME + "/req"
 PUBLISH_TOPIC = "downloadStatus/" + THING_NAME + "/res"
 IOT_CORE_ENDPOINT = "a1k4mu7a9eqjbq-ats.iot.ap-south-1.amazonaws.com"
-CA_CERT = "./certs/AmazonRootCA1.pem"
-CERT_FILE = "./certs/cert_file.pem.crt"
-PRIVATE_KEY = "./certs/private_file.pem.key"
+CA_CERT = "/workspaces/beg_sdv_hackathon/app/src/certs/AmazonRootCA1.pem"
+CERT_FILE = "/workspaces/beg_sdv_hackathon/app/src/certs/cert_file.pem.crt"
+PRIVATE_KEY = "/workspaces/beg_sdv_hackathon/app/src/certs/private_file.pem.key"
 DOWNLOAD_PATH = "./data"
 TEMP_DOWNLOAD_PATH = "./data"
 STATUS_FILE_PATH = "./data"
@@ -28,8 +28,8 @@ class AwsConnector:
         self.__mqtt_client.on_connect = self.on_connect
         self.__mqtt_client.on_message = self.on_message
         self.__mqtt_client.on_subscribe = self.on_subscribe
-        self.__mqtt_client.connect(IOT_CORE_ENDPOINT, 8883, 60)
-        self.__mqtt_client.loop_forever()
+        # self.__mqtt_client.connect(IOT_CORE_ENDPOINT, 8883, 60)
+        # self.__mqtt_client.loop_forever()
 
     def on_connect(self, mqtt_client, userdata, flags, rc, properties=None):
         print("connected to endpoint with result code", rc)
@@ -45,22 +45,23 @@ class AwsConnector:
         print("subscribing to topic: ", SUBSCRIBE_TOPIC)
         mqtt_client.subscribe(SUBSCRIBE_TOPIC, qos=0, options=None, properties=None)
 
-    def on_subscribe(self, client, userdata, mid, granted_qos):
+    def on_subscribe(self, client, userdata, mid, granted_qos, unknown):
         print("Subscribed")
 
     def on_message(self, mqtt_client, userdata, msg):
-        payload = msg.payload
-        try:
-            json_payload = json.loads(payload)
-        except json.decoder.JSONDecodeError:
-            print("on_mqtt_message: Invalid JSON (most likely programming error)")
-            return
-        if json_payload["cmd"] == "download_config":
-            response = {
-                "cmd": "download_config",
-                "success": True,
-            }
-            mqtt_client.publish(PUBLISH_TOPIC, payload=json.dumps(response))
+        print("on_msg")
+        # payload = msg.payload
+        # try:
+        #     json_payload = json.loads(payload)
+        # except json.decoder.JSONDecodeError:
+        #     print("on_mqtt_message: Invalid JSON (most likely programming error)")
+        #     return
+        # if json_payload["cmd"] == "download_config":
+        #     response = {
+        #         "cmd": "download_config",
+        #         "success": True,
+        #     }
+        #     mqtt_client.publish(PUBLISH_TOPIC, payload=json.dumps(response))
 
 
 aws_connector = AwsConnector()
