@@ -19,7 +19,6 @@ import json
 import logging
 import signal
 
-from aws_connecter import AwsConnector
 from vehicle import Vehicle, vehicle  # type: ignore
 from velocitas_sdk.util.log import (  # type: ignore
     get_opentelemetry_log_factory,
@@ -42,22 +41,12 @@ GET_ACCEL_REQUEST_TOPIC = "sampleapp/getAccel"
 GET_ACCEL_RESPONSE_TOPIC = "sampleapp/getAccel/response"
 ACCEL_DATABROKER_SUBSCRIPTION_TOPIC = "sampleapp/accelData"
 
+GET_GPS_REQUEST_TOPIC = "sampleapp/getGps"
+GET_GPS_RESPONSE_TOPIC = "sampleapp/getGps/response"
+GPS_DATABROKER_SUBSCRIPTION_TOPIC = "sampleapp/gpsData"
+
 
 class SampleApp(VehicleApp):
-    """
-    Sample skeleton vehicle app.
-
-    The skeleton subscribes to a getSpeed MQTT topic
-    to listen for incoming requests to get
-    the current vehicle speed and publishes it to
-    a response topic.
-
-    It also subcribes to the VehicleDataBroker
-    directly for updates of the
-    Vehicle.Speed signal and publishes this
-    information via another specific MQTT topic
-    """
-
     def __init__(self, vehicle_client: Vehicle):
         # SampleApp inherits from VehicleApp.
         super().__init__()
@@ -65,21 +54,39 @@ class SampleApp(VehicleApp):
         self.accel_lat = 0
         self.accel_long = 0
         self.accel_vert = 0
-        self.aws_connector = AwsConnector()
+        # self.aws_connector = AwsConnector()
+        self.gps_lat = 0
+        self.gps_long = 0
 
     async def on_start(self):
         """Run when the vehicle app starts"""
         # This method will be called by the SDK when the connection to the
         # Vehicle DataBroker is ready.
         # Here you can subscribe for the Vehicle Signals update (e.g. Vehicle Speed).
-        await self.Vehicle.Acceleration.Lateral.subscribe(self.on_accel_change_lat)
+        await self.Vehicle.Acceleration.Lateral.subscribe(self.on_accel_lat_change)
         await self.Vehicle.Acceleration.Longitudinal.subscribe(
-            self.on_accel_change_long
+            self.on_accel_long_change
         )
-        await self.Vehicle.Acceleration.Vertical.subscribe(self.on_accel_change_vert)
+        await self.Vehicle.Acceleration.Vertical.subscribe(self.on_accel_vert_change)
+        await self.Vehicle.CurrentLocation.Latitude.subscribe(self.on_gps_lat_change)
+        await self.Vehicle.CurrentLocation.Longitude.subscribe(self.on_gps_long_change)
         await self.Vehicle.Speed.subscribe(self.on_speed_change)
 
-    async def on_accel_change_lat(self, data: DataPointReply):
+    async def on_gps_lat_change(self, data: DataPointReply):
+        self.gps_lat = data.get(self.Vehicle.CurrentLocation.Latitude).value
+        await self.publish_event(
+            GPS_DATABROKER_SUBSCRIPTION_TOPIC,
+            json.dumps({"gps_lat": self.gps_lat, "gps_long": self.gps_long}),
+        )
+
+    async def on_gps_long_change(self, data: DataPointReply):
+        self.gps_long = data.get(self.Vehicle.CurrentLocation.Longitude).value
+        await self.publish_event(
+            GPS_DATABROKER_SUBSCRIPTION_TOPIC,
+            json.dumps({"gps_lat": self.gps_lat, "gps_long": self.gps_long}),
+        )
+
+    async def on_accel_lat_change(self, data: DataPointReply):
         self.accel_lat = data.get(self.Vehicle.Acceleration.Lateral).value
         await self.publish_event(
             ACCEL_DATABROKER_SUBSCRIPTION_TOPIC,
@@ -92,7 +99,7 @@ class SampleApp(VehicleApp):
             ),
         )
 
-    async def on_accel_change_long(self, data: DataPointReply):
+    async def on_accel_long_change(self, data: DataPointReply):
         self.accel_long = data.get(self.Vehicle.Acceleration.Longitudinal).value
         await self.publish_event(
             ACCEL_DATABROKER_SUBSCRIPTION_TOPIC,
@@ -105,7 +112,7 @@ class SampleApp(VehicleApp):
             ),
         )
 
-    async def on_accel_change_vert(self, data: DataPointReply):
+    async def on_accel_vert_change(self, data: DataPointReply):
         self.accel_vert = data.get(self.Vehicle.Acceleration.Vertical).value
         await self.publish_event(
             ACCEL_DATABROKER_SUBSCRIPTION_TOPIC,
@@ -188,6 +195,28 @@ class SampleApp(VehicleApp):
                     "result": {
                         "status": 0,
                         "message": f"""Accel Lat = {self.accel_lat},Accel Long = {self.accel_long},Accel Vert = {self.accel_vert}""",
+                    },
+                }
+            ),
+        )
+
+    @subscribe_topic(GET_GPS_REQUEST_TOPIC)
+    async def on_get_gps_request_received(self, data: str) -> None:
+        logger.debug(
+            "PubSub event for the Topic: %s -> is received with the data: %s",
+            GET_GPS_REQUEST_TOPIC,
+            data,
+        )
+        self.gps_lat = (await self.Vehicle.CurrentLocation.Latitude.get()).value
+        self.gps_long = (await self.Vehicle.CurrentLocation.Longitude.get()).value
+
+        await self.publish_event(
+            GET_GPS_RESPONSE_TOPIC,
+            json.dumps(
+                {
+                    "result": {
+                        "status": 0,
+                        "message": f"""Gps Lat = {self.gps_lat},Gps Long = {self.gps_long}""",
                     },
                 }
             ),
