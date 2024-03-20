@@ -22,7 +22,20 @@ async def main():
     )
     for row in rows:
         for signal, value in zip(signals, row):
+            print(signals)
+            print(row)
             await inttesthelper.set_string_datapoint(name=signal, value=value)
+
+    response = await inttesthelper.set_float_datapoint(
+        name="Vehicle.Acceleration.Lateral", value=3.5
+    )
+    response = await inttesthelper.set_float_datapoint(
+        name="Vehicle.Acceleration.Longitudinal", value=4.6
+    )
+    response = await inttesthelper.set_float_datapoint(
+        name="Vehicle.Acceleration.Vertical", value=5.7
+    )
+    print("published")
 
 
 if __name__ == "__main__":
