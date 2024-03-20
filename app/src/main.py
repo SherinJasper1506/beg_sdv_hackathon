@@ -21,9 +21,7 @@ import signal
 
 from vehicle import Vehicle, vehicle  # type: ignore
 from velocitas_sdk.util.log import (  # type: ignore
-    get_opentelemetry_log_factory,
-    get_opentelemetry_log_format,
-)
+    get_opentelemetry_log_factory, get_opentelemetry_log_format)
 from velocitas_sdk.vdb.reply import DataPointReply
 from velocitas_sdk.vehicle_app import VehicleApp, subscribe_topic
 
@@ -185,7 +183,7 @@ class SampleApp(VehicleApp):
                 {
                     "result": {
                         "status": 0,
-                        "message": f"""Accel Lat = {self.accel_lat},Accel Long = {accel_long},Accel Vert = {accel_vert}""",
+                        "message": f"""Accel Lat = {self.accel_lat},Accel Long = {self.accel_long},Accel Vert = {self.accel_vert}""",
                     },
                 }
             ),
