@@ -18,7 +18,11 @@
 FROM --platform=$TARGETPLATFORM ghcr.io/eclipse-velocitas/devcontainer-base-images/python:v0.2 as builder
 ARG TARGETARCH
 
-RUN apt-get update && apt-get install -y python3-dev
+RUN apt-get update && apt-get install -y python3-dev \
+    && apt-get install -y binutils \
+    && apt-get install -y bash \
+    && apt-get install -y pip \
+    && apt-get install -y strace 
 
 COPY ./.velocitas.json /workspace/.velocitas_org.json
 COPY ./app /workspace/app
@@ -55,15 +59,12 @@ WORKDIR /workspace/app/dist
 RUN staticx main run-exe
 
 # Runner stage, to copy the executable
-FROM scratch
+#FROM scratch
 
-COPY --from=builder ./workspace/app/dist/run-exe /dist/
+#COPY --from=builder ./workspace/app/dist/run-exe /dist/
 
 WORKDIR /tmp
 WORKDIR /dist
 
-ENV PATH="/dist:$PATH"
-
-LABEL org.opencontainers.image.source="https://github.com/eclipse-velocitas/vehicle-app-python-template"
-
-CMD ["./run-exe"]
+#ENV PATH="/dist:$PATH"
+CMD ["bash"]
