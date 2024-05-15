@@ -63,8 +63,7 @@ RUN staticx main run-exe
 
 #COPY --from=builder ./workspace/app/dist/run-exe /dist/
 
-WORKDIR /tmp
-WORKDIR /dist
+COPY ./app /dist
 
 #ENV PATH="/dist:$PATH"
 CMD ["bash"]
