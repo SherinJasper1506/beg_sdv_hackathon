@@ -17,7 +17,7 @@
             "env": {
                 "APP_PORT": "50008",
                 "DAPR_HTTP_PORT": "3500",
-                "DAPR_GRPC_PORT": "50001",
+                "DAPR_GRPC_PORT": "55555",
                 "VEHICLEDATABROKER_DAPR_APP_ID": "vehicledatabroker"
             }
         }
