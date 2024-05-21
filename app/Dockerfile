@@ -21,8 +21,7 @@ ARG TARGETARCH
 RUN apt-get update && apt-get install -y python3-dev \
     && apt-get install -y binutils \
     && apt-get install -y bash \
-    && apt-get install -y pip \
-    && apt-get install -y strace 
+    && apt-get install -y pip
 
 COPY ./.velocitas.json /workspace/.velocitas_org.json
 COPY ./app /workspace/app
