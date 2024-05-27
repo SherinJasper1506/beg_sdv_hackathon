@@ -86,7 +86,7 @@ class AwsConnector:
     def publish_message(self, accel_x, accel_y, accel_z):
         message_json = json.dumps(
                 {
-                    "time": int(time.time()*1000),
+                    "time": (int(time.time()*1000) -5600000) ,
                     "accel_x": accel_x,
                     "accel_y": accel_y,
                     "accel_z": accel_z,
