@@ -33,3 +33,11 @@ alias r1='python3 main.py'
 alias c2='rm aws_connecter.py'
 
 alias n2='nano aws_connecter.py'
+
+kanto-cm create --name pothole-app --network=host --t --i  --mp="/tmp:/tmp"  ghcr.io/sherinjasper1506/beg_sdv_hackathon:arm64@sha256:7c0cb90490597a8eec9682b476ac8106f84d87f81f45875a0177d83eacd5b8c0
+
+kanto-cm create --name gps-data --network=host --t --i  --mp="/tmp:/tmp"  --devices=/dev/ttymxc3:/dev/ttymxc3  --devices=/dev/owa5x_gpio:/dev/owa5x_gpio ghcr.io/ronit-wilson-r/gps-accel-data:arm64@sha256:8f1ef1f339b737a775832b40643b7ccf80d0ea5ba6da7b88e660df6539de3bbc
+
+kanto-cm create --name  databroker --network=host ghcr.io/eclipse/kuksa.val/databroker:0.4.1
+
+kanto-cm create --name  databroker-cli --network=host --t --i ghcr.io/eclipse/kuksa.val/databroker-cli:0.4.1

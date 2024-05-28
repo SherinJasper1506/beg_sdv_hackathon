@@ -104,10 +104,12 @@ class SampleApp(VehicleApp):
 
     async def on_gps_lat_change(self, data: DataPointReply):
         self.gps_lat = data.get(self.Vehicle.CurrentLocation.Latitude).value
+        print(self.gps_lat)
 
 
     async def on_gps_long_change(self, data: DataPointReply):
         self.gps_long = data.get(self.Vehicle.CurrentLocation.Longitude).value
+        print(self.gps_long)
 
 
     async def on_accel_lat_change(self, data: DataPointReply):
