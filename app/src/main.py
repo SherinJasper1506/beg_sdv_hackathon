@@ -53,10 +53,11 @@ class SampleApp(VehicleApp):
         self.gps_long = 0
         self.aws_connector = None
         self.aws_connected = False
+        self.count = 0
         asyncio.create_task(self.on_start_m())
         asyncio.create_task(self.start_aws())
         # asyncio.create_task(self.test_while())
-        # asyncio.create_task(self.test_while2())
+        # asyncio.create_task(self.test_while2()
 
     def post_to_firebase(self, latitude, longitude, accelerometer_vert_value):
         timestamp = round(datetime.now().timestamp() * 1000)
@@ -91,51 +92,49 @@ class SampleApp(VehicleApp):
         #
         print("on start done")
 
-    async def test_while(self):
-        while 1:
-            print("in test while")
-            time.sleep(1)
-            
-    async def test_while2(self):
-        while 1:
-            print("in test while2")
-            time.sleep(1)
-
-
     async def on_gps_lat_change(self, data: DataPointReply):
         self.gps_lat = data.get(self.Vehicle.CurrentLocation.Latitude).value
-        print(self.gps_lat)
+        # await self.pub_gps_data()
+        # if self.count == 0:
+        #     self.pub_gps_data()
+        #     self.count += 1
+        self.pub_gps_data()
+
 
 
     async def on_gps_long_change(self, data: DataPointReply):
         self.gps_long = data.get(self.Vehicle.CurrentLocation.Longitude).value
-        print(self.gps_long)
+        await self.pub_gps_data()
+
 
 
     async def on_accel_lat_change(self, data: DataPointReply):
         self.accel_lat = data.get(self.Vehicle.Acceleration.Lateral).value
-        print("on_accel_lat_change")
-        print(self.accel_lat)
+
         await self.pub_accel_data()
 
 
     async def on_accel_long_change(self, data: DataPointReply):
         self.accel_long = data.get(self.Vehicle.Acceleration.Longitudinal).value
-        print("on_accel_long_change")
-        print(self.accel_long)
+        # print("on_accel_long_change")
+        # print(self.accel_long)
         await self.pub_accel_data()
 
 
     async def on_accel_vert_change(self, data: DataPointReply):
         self.accel_vert = data.get(self.Vehicle.Acceleration.Vertical).value
-        print("on_accel_vert_change")
-        print(self.accel_vert)
+        # print("on_accel_vert_change")
+        # print(self.accel_vert)
         await self.pub_accel_data()
 
     async def pub_accel_data(self):
         if self.aws_connector.status:
             print("pub_accel_data")
             self.aws_connector.publish_message(self.accel_lat, self.accel_long, self.accel_vert)
+
+    async def pub_gps_data(self):
+        if self.aws_connector.status:
+            self.aws_connector.publish_gps_message(self.gps_lat, self.gps_long)
 
 async def main():
     """Main function"""

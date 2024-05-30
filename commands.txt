@@ -41,3 +41,4 @@ kanto-cm create --name gps-data --network=host --t --i  --mp="/tmp:/tmp"  --devi
 kanto-cm create --name  databroker --network=host ghcr.io/eclipse/kuksa.val/databroker:0.4.1
 
 kanto-cm create --name  databroker-cli --network=host --t --i ghcr.io/eclipse/kuksa.val/databroker-cli:0.4.1
+kanto-cm start --name   databroker-cli --a --i
