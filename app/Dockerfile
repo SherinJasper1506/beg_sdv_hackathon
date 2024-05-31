@@ -65,4 +65,7 @@ RUN velocitas init
 COPY ./app /dist
 
 #ENV PATH="/dist:$PATH"
-CMD ["python3 /dist/src/main.py"]
+ENV SDV_MIDDLEWARE_TYPE="native"
+ENV SDV_VEHICLEDATABROKER_ADDRESS="grpc://localhost:55555"
+
+CMD ["bash"]
