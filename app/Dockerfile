@@ -49,13 +49,13 @@ WORKDIR /workspace
 
 RUN velocitas init
 
-WORKDIR /workspace/app
+# WORKDIR /workspace/app
 
-RUN pyinstaller --clean -F -s src/main.py
+# RUN pyinstaller --clean -F -s src/main.py
 
-WORKDIR /workspace/app/dist
+# WORKDIR /workspace/app/dist
 
-RUN staticx main run-exe
+# RUN staticx main run-exe
 
 # Runner stage, to copy the executable
 #FROM scratch
@@ -65,4 +65,4 @@ RUN staticx main run-exe
 COPY ./app /dist
 
 #ENV PATH="/dist:$PATH"
-CMD ["bash"]
+CMD ["python3 /dist/src/main.py"]
