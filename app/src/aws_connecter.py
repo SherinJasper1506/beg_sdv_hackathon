@@ -5,10 +5,11 @@ import threading
 
 import paho.mqtt.client as mqtt
 
-THING_NAME = "demoVehicleThing"
+THING_NAME = "rcu_lab"
 SUBSCRIBE_TOPIC = "downloadStatus/" + THING_NAME + "/req"
 PUBLISH_TOPIC = "sdk/test/python"
 PUBLISH_GPS_TOPIC = "sdv/gps"
+PUBLISH_GPS_ACCEL_TOPIC = "sdv/combined"
 IOT_CORE_ENDPOINT = "a1k4mu7a9eqjbq-ats.iot.eu-central-1.amazonaws.com"
 CA_CERT = "/dist/src/certs/AmazonRootCA1.pem"
 CERT_FILE = "/dist/src/certs/cert_file.pem.crt"
@@ -87,7 +88,7 @@ class AwsConnector:
                     "hostname": "rcu_lab"
                 }, indent=2
             )
-        print(message_json)
+        # print(message_json)
         self.mqtt_client.publish(
                 topic=PUBLISH_TOPIC,
                 payload=message_json)
@@ -102,9 +103,28 @@ class AwsConnector:
                     "hostname": "rcu_lab"
                 }, indent=2
             )
-        print(message_json)
+        # print(message_json)
         self.mqtt_client.publish(
                 topic=PUBLISH_GPS_TOPIC,
+                payload=message_json)
+
+
+    def publish_gps_accel_message(self, lat, long, accel_x, accel_y, accel_z):
+        # print("pub gps and data")
+        message_json = json.dumps(
+                {
+                    "time": (int(time.time()*1000) -20) ,
+                    "lat": lat,
+                    "long": long,
+                    "accel_x": accel_x,
+                    "accel_y": accel_y,
+                    "accel_z": accel_z,
+                    "hostname": "rcu_lab"
+                }, indent=2
+            )
+        print(message_json)
+        self.mqtt_client.publish(
+                topic=PUBLISH_GPS_ACCEL_TOPIC,
                 payload=message_json)
 
 # aws_connector = AwsConnector()

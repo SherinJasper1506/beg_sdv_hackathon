@@ -98,13 +98,15 @@ class SampleApp(VehicleApp):
         # if self.count == 0:
         #     self.pub_gps_data()
         #     self.count += 1
-        self.pub_gps_data()
+        await self.pub_gps_data()
+        await self.pub_gps_accel_data()
 
 
 
     async def on_gps_long_change(self, data: DataPointReply):
         self.gps_long = data.get(self.Vehicle.CurrentLocation.Longitude).value
         await self.pub_gps_data()
+        await self.pub_gps_accel_data()
 
 
 
@@ -135,6 +137,10 @@ class SampleApp(VehicleApp):
     async def pub_gps_data(self):
         if self.aws_connector.status:
             self.aws_connector.publish_gps_message(self.gps_lat, self.gps_long)
+    
+    async def pub_gps_accel_data(self):
+        if self.aws_connector.status:
+            self.aws_connector.publish_gps_accel_message(self.gps_lat, self.gps_long, self.accel_lat, self.accel_long, self.accel_vert)
 
 async def main():
     """Main function"""
