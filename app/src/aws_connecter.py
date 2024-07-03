@@ -10,15 +10,9 @@ SUBSCRIBE_TOPIC = "downloadStatus/" + THING_NAME + "/req"
 PUBLISH_TOPIC = "sdk/test/python"
 PUBLISH_GPS_TOPIC = "sdv/gps"
 IOT_CORE_ENDPOINT = "a1k4mu7a9eqjbq-ats.iot.eu-central-1.amazonaws.com"
-CA_CERT = "./certs/AmazonRootCA1.pem"
-CERT_FILE = "./certs/cert_file.pem.crt"
-PRIVATE_KEY = "./certs/private_file.pem.key"
-DOWNLOAD_PATH = "./data"
-TEMP_DOWNLOAD_PATH = "./data"
-STATUS_FILE_PATH = "./data"
-DOWNLOAD_CHUNK_SIZE = 3000000
-INSTALLATION_TIMEOUT_SECONDS = 120
-MODE = "test"  # change on gateway
+CA_CERT = "/dist/src/certs/AmazonRootCA1.pem"
+CERT_FILE = "/dist/src/certs/cert_file.pem.crt"
+PRIVATE_KEY = "/dist/src/certs/private_file.pem.key"
 
 
 class AwsConnector:
