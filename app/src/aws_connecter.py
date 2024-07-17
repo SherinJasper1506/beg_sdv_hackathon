@@ -5,7 +5,7 @@ import threading
 
 import paho.mqtt.client as mqtt
 
-THING_NAME = "rcu_lab"
+THING_NAME = "rcu_car"
 SUBSCRIBE_TOPIC = "downloadStatus/" + THING_NAME + "/req"
 PUBLISH_TOPIC = "sdk/test/python"
 PUBLISH_GPS_TOPIC = "sdv/gps"
@@ -85,7 +85,7 @@ class AwsConnector:
                     "accel_x": accel_x,
                     "accel_y": accel_y,
                     "accel_z": accel_z,
-                    "hostname": "rcu_lab"
+                    "hostname": "rcu_car"
                 }, indent=2
             )
         # print(message_json)
@@ -100,7 +100,7 @@ class AwsConnector:
                     "time": (int(time.time()*1000) -20) ,
                     "lat": lat,
                     "long": long,
-                    "hostname": "rcu_lab"
+                    "hostname": "rcu_car"
                 }, indent=2
             )
         # print(message_json)
@@ -119,7 +119,7 @@ class AwsConnector:
                     "accel_x": accel_x,
                     "accel_y": accel_y,
                     "accel_z": accel_z,
-                    "hostname": "rcu_lab"
+                    "hostname": "rcu_car"
                 }, indent=2
             )
         print(message_json)
