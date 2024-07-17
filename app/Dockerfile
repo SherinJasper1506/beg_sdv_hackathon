@@ -19,7 +19,7 @@ FROM --platform=$TARGETPLATFORM ghcr.io/eclipse-velocitas/devcontainer-base-imag
 ARG TARGETARCH
 
 RUN apt-get update && apt-get install -y python3-dev \
-    && apt-get install -y binutils \
+    # && apt-get install -y binutils \
     && apt-get install -y bash \
     && apt-get install -y pip
 
@@ -45,7 +45,10 @@ RUN pip3 install --no-cache-dir pyinstaller==5.9.0 \
     && pip3 install --no-cache-dir -r ./workspace/app/requirements.txt \
     && pip3 install --no-cache-dir -r ./workspace/app/requirements-links.txt
 
-WORKDIR /workspace
+RUN pip3 install --no-cache-dir -r ./workspace/app/requirements.txt \
+    && pip3 install --no-cache-dir -r ./workspace/app/requirements-links.txt
+
+# WORKDIR /workspace
 
 RUN velocitas init
 
