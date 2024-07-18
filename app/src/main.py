@@ -99,14 +99,14 @@ class SampleApp(VehicleApp):
         #     self.pub_gps_data()
         #     self.count += 1
         await self.pub_gps_data()
-        await self.pub_gps_accel_data()
+        # await self.pub_gps_accel_data()
 
 
 
     async def on_gps_long_change(self, data: DataPointReply):
         self.gps_long = data.get(self.Vehicle.CurrentLocation.Longitude).value
         await self.pub_gps_data()
-        await self.pub_gps_accel_data()
+        # await self.pub_gps_accel_data()
 
 
 
@@ -114,6 +114,7 @@ class SampleApp(VehicleApp):
         self.accel_lat = data.get(self.Vehicle.Acceleration.Lateral).value
 
         await self.pub_accel_data()
+        await self.pub_gps_accel_data()
 
 
     async def on_accel_long_change(self, data: DataPointReply):
@@ -121,6 +122,7 @@ class SampleApp(VehicleApp):
         # print("on_accel_long_change")
         # print(self.accel_long)
         await self.pub_accel_data()
+        await self.pub_gps_accel_data()
 
 
     async def on_accel_vert_change(self, data: DataPointReply):
@@ -128,6 +130,7 @@ class SampleApp(VehicleApp):
         # print("on_accel_vert_change")
         # print(self.accel_vert)
         await self.pub_accel_data()
+        await self.pub_gps_accel_data()
 
     async def pub_accel_data(self):
         if self.aws_connector.status:

@@ -1,7 +1,7 @@
 ====================== create commands ========================
-kanto-cm create --name pothole-app --network=host --t --i  --mp="/tmp:/tmp"  ghcr.io/sherinjasper1506/beg_sdv_hackathon:arm64@sha256:e8aadc09a67bf2be2b414e43718c6c8b4d98a130ec01edffe73f73fdf523455b
+kanto-cm create --name pothole-app --network=host --t --i  --mp="/tmp:/tmp"  ghcr.io/sherinjasper1506/beg_sdv_hackathon:arm64@sha256:f89e49fc5a8a43642c9918215cbf8c9785c1f8e5155bb4bae05f73f3c5624749
 
-kanto-cm create --name gps-data --network=host --t --i  --mp="/tmp:/tmp"  --devices=/dev/ttymxc3:/dev/ttymxc3  --devices=/dev/owa5x_gpio:/dev/owa5x_gpio ghcr.io/ronit-wilson-r/gps-accel-data:arm64@sha256:a77479cfe3df75bd93d96a2dd674bc3115410a19dfe607767d300af28dd157dc
+kanto-cm create --name gps-data --network=host --t --i  --mp="/tmp:/tmp"  --devices=/dev/ttymxc3:/dev/ttymxc3  --devices=/dev/owa5x_gpio:/dev/owa5x_gpio ghcr.io/ronit-wilson-r/gps-accel-data:arm64@sha256:97e989e9d7b07cd7df2863d3a51e33b7d84ff71697a4dc8511a3cd6789bd1978
 
 kanto-cm create --name  databroker --network=host ghcr.io/eclipse/kuksa.val/databroker:0.4.1
 
