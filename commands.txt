@@ -1,15 +1,15 @@
-kanto-cm create --name pothole-app --network=host --t --i  --mp="/tmp:/tmp"  ghcr.io/sherinjasper1506/beg_sdv_hackathon:arm64@sha256:3a69d412dc26354afddf754374518bce67b1ac4dfc23bdb38e40e03141535e05
+====================== create commands ========================
+kanto-cm create --name pothole-app --network=host --t --i  --mp="/tmp:/tmp"  ghcr.io/sherinjasper1506/beg_sdv_hackathon:arm64@sha256:e8aadc09a67bf2be2b414e43718c6c8b4d98a130ec01edffe73f73fdf523455b
 
+kanto-cm create --name gps-data --network=host --t --i  --mp="/tmp:/tmp"  --devices=/dev/ttymxc3:/dev/ttymxc3  --devices=/dev/owa5x_gpio:/dev/owa5x_gpio ghcr.io/ronit-wilson-r/gps-accel-data:arm64@sha256:a77479cfe3df75bd93d96a2dd674bc3115410a19dfe607767d300af28dd157dc
 
 kanto-cm create --name  databroker --network=host ghcr.io/eclipse/kuksa.val/databroker:0.4.1
 
 kanto-cm create --name  databroker-cli --network=host --t --i ghcr.io/eclipse/kuksa.val/databroker-cli:0.4.1
 
+old ids: a77479cfe3df75bd93d96a2dd674bc3115410a19dfe607767d300af28dd157dc
 
-kanto-cm create --name pothole-app --network=host --t --i  --mp="/tmp:/tmp"  ghcr.io/sherinjasper1506/beg_sdv_hackathon:arm64@sha256:2dc6daf09486eba9b378b5f43c3cd3f926ddb4ca09aaa0e746c736a977aa4254
-
-kanto-cm create --name gps-data --network=host --t --i  --mp="/tmp:/tmp"  --devices=/dev/ttymxc3:/dev/ttymxc3  --devices=/dev/owa5x_gpio:/dev/owa5x_gpio ghcr.io/ronit-wilson-r/gps-accel-data:arm64@sha256:726b5ce0c6119741dc3fa0256ed23312af167f6ae294d889827688194815d8c0
-
+====================== start commands ========================
 
 kanto-cm start --name  pothole-app --a --i
 
@@ -17,12 +17,16 @@ kanto-cm start --name  gps-data --a --i
 
 kanto-cm start --name  databroker
 
-export SDV_MIDDLEWARE_TYPE="native"
-export SDV_VEHICLEDATABROKER_ADDRESS="grpc://localhost:55555"
+kanto-cm start --name   databroker-cli --a --i
 
 kanto-cm stop  -f --name pothole-app 
 
 kanto-cm stop  -f --name  gps-data
+
+
+====================== other commands ========================
+export SDV_MIDDLEWARE_TYPE="native"
+export SDV_VEHICLEDATABROKER_ADDRESS="grpc://localhost:55555"
 
 alias c1='rm main.py'
 
@@ -33,12 +37,3 @@ alias r1='python3 main.py'
 alias c2='rm aws_connecter.py'
 
 alias n2='nano aws_connecter.py'
-
-kanto-cm create --name pothole-app --network=host --t --i  --mp="/tmp:/tmp"  ghcr.io/sherinjasper1506/beg_sdv_hackathon:arm64@sha256:7c0cb90490597a8eec9682b476ac8106f84d87f81f45875a0177d83eacd5b8c0
-
-kanto-cm create --name gps-data-2 --network=host --t --i  --mp="/tmp:/tmp"  --devices=/dev/ttymxc3:/dev/ttymxc3  --devices=/dev/owa5x_gpio:/dev/owa5x_gpio ghcr.io/ronit-wilson-r/gps-accel-data:arm64@sha256:8195679363e11ba6b117ed0990d681a239c3fa73342c90aec614df27efaf72b7
-
-kanto-cm create --name  databroker --network=host ghcr.io/eclipse/kuksa.val/databroker:0.4.1
-
-kanto-cm create --name  databroker-cli --network=host --t --i ghcr.io/eclipse/kuksa.val/databroker-cli:0.4.1
-kanto-cm start --name   databroker-cli --a --i
