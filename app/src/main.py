@@ -54,10 +54,24 @@ class SampleApp(VehicleApp):
         self.aws_connector = None
         self.aws_connected = False
         self.count = 0
-        asyncio.create_task(self.on_start_m())
+        # asyncio.create_task(self.on_start_m())
         asyncio.create_task(self.start_aws())
+        asyncio.create_task(self.run_get_data())
         # asyncio.create_task(self.test_while())
         # asyncio.create_task(self.test_while2()
+
+    
+    async def run_get_data():
+        while True:
+            self.on_accel_lat_change = await self.Vehicle.Acceleration.Lateral.get()
+            self.on_accel_long_change = await self.Vehicle.Acceleration.Longitudinal.get()
+            self.on_accel_vert_change = await self.Vehicle.Acceleration.Vertical.get()
+            self.on_gps_lat_change = await self.Vehicle.CurrentLocation.Latitude.get()
+            self.on_gps_long_change = await self.Vehicle.CurrentLocation.Longitude.get()
+            if self.aws_connector.status:
+                self.aws_connector.publish_gps_accel_message(self.gps_lat, self.gps_long, self.accel_lat, self.accel_long, self.accel_vert)
+            await asyncio.sleep(0.1)
+
 
     def post_to_firebase(self, latitude, longitude, accelerometer_vert_value):
         timestamp = round(datetime.now().timestamp() * 1000)
