@@ -68,8 +68,8 @@ class SampleApp(VehicleApp):
             self.on_accel_vert_change = await self.Vehicle.Acceleration.Vertical.get()
             self.on_gps_lat_change = await self.Vehicle.CurrentLocation.Latitude.get()
             self.on_gps_long_change = await self.Vehicle.CurrentLocation.Longitude.get()
+            time = (int(time.time()*1000) -20)
             if self.aws_connector.status:
-                time = (int(time.time()*1000) -20)
                 self.aws_connector.publish_gps_accel_message(self.gps_lat, self.gps_long, self.accel_lat, self.accel_long, self.accel_vert, time)
             await asyncio.sleep(0.1)
 
