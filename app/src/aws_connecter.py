@@ -109,13 +109,13 @@ class AwsConnector:
                 payload=message_json)
 
 
-    def publish_gps_accel_message(self, lat, long, accel_x, accel_y, accel_z, time=0):
+    def publish_gps_accel_message(self, lat, long, accel_x, accel_y, accel_z, current_time=0):
         # print("pub gps and data")
-        if time != 0:
-            time = (int(time.time()*1000) -20)
+        if current_time != 0:
+            current_time = (int(time.time()*1000) -20)
         message_json = json.dumps(
                 {
-                    "time": time,
+                    "time": current_time,
                     "lat": lat,
                     "long": long,
                     "accel_x": accel_x,
