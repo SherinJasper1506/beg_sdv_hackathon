@@ -61,7 +61,7 @@ class SampleApp(VehicleApp):
         # asyncio.create_task(self.test_while2()
 
     
-    async def run_get_data():
+    async def run_get_data(self):
         while True:
             self.on_accel_lat_change = await self.Vehicle.Acceleration.Lateral.get()
             self.on_accel_long_change = await self.Vehicle.Acceleration.Longitudinal.get()
