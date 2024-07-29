@@ -63,11 +63,11 @@ class SampleApp(VehicleApp):
     
     async def run_get_data(self):
         while True:
-            self.on_accel_lat_change = await self.Vehicle.Acceleration.Lateral.get()
-            self.on_accel_long_change = await self.Vehicle.Acceleration.Longitudinal.get()
-            self.on_accel_vert_change = await self.Vehicle.Acceleration.Vertical.get()
-            self.on_gps_lat_change = await self.Vehicle.CurrentLocation.Latitude.get()
-            self.on_gps_long_change = await self.Vehicle.CurrentLocation.Longitude.get()
+            self.accel_lat = await self.Vehicle.Acceleration.Lateral.get()
+            self.accel_long = await self.Vehicle.Acceleration.Longitudinal.get()
+            self.accel_vert = await self.Vehicle.Acceleration.Vertical.get()
+            self.gps_lat = await self.Vehicle.CurrentLocation.Latitude.get()
+            self.gps_long = await self.Vehicle.CurrentLocation.Longitude.get()
             current_time = (int(time.time()*1000) -20)
             if self.aws_connector.status:
                 self.aws_connector.publish_gps_accel_message(self.gps_lat, self.gps_long, self.accel_lat, self.accel_long, self.accel_vert, current_time)
