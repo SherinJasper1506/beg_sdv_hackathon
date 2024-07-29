@@ -69,6 +69,13 @@ class SampleApp(VehicleApp):
             self.gps_lat = await self.Vehicle.CurrentLocation.Latitude.get()
             self.gps_long = await self.Vehicle.CurrentLocation.Longitude.get()
             current_time = (int(time.time()*1000) -20)
+            #print accel and gps
+            print("accel_lat: ", self.accel_lat)
+            print("accel_long: ", self.accel_long)
+            print("accel_vert: ", self.accel_vert)
+            print("gps_lat: ", self.gps_lat)
+            print("gps_long: ", self.gps_long)
+            print("current_time: ", current_time)
             if self.aws_connector.status:
                 self.aws_connector.publish_gps_accel_message(self.gps_lat, self.gps_long, self.accel_lat, self.accel_long, self.accel_vert, current_time)
             await asyncio.sleep(0.1)
