@@ -63,19 +63,17 @@ class SampleApp(VehicleApp):
     
     async def run_get_data(self):
         while True:
-            self.accel_lat = await self.Vehicle.Acceleration.Lateral.get()
-            self.accel_long = await self.Vehicle.Acceleration.Longitudinal.get()
-            self.accel_vert = await self.Vehicle.Acceleration.Vertical.get()
-            self.gps_lat = await self.Vehicle.CurrentLocation.Latitude.get()
-            self.gps_long = await self.Vehicle.CurrentLocation.Longitude.get()
+            accel_lat_obj = await self.Vehicle.Acceleration.Lateral.get()
+            accel_long_obj = await self.Vehicle.Acceleration.Longitudinal.get()
+            accel_vert_obj = await self.Vehicle.Acceleration.Vertical.get()
+            lat_obj = await self.Vehicle.CurrentLocation.Latitude.get()
+            long_obj = await self.Vehicle.CurrentLocation.Longitude.get()
             current_time = (int(time.time()*1000) -20)
-            #print accel and gps
-            print("accel_lat: ", self.accel_lat.value)
-            print("accel_long: ", self.accel_long)
-            print("accel_vert: ", self.accel_vert)
-            print("gps_lat: ", self.gps_lat)
-            print("gps_long: ", self.gps_long)
-            print("current_time: ", current_time)
+            self.accel_lat = accel_lat_obj.value
+            self.accel_long = accel_long_obj.value
+            self.accel_vert = accel_vert_obj.value
+            self.gps_lat = lat_obj.value
+            self.gps_long = long_obj.value
             if self.aws_connector.status:
                 self.aws_connector.publish_gps_accel_message(self.gps_lat, self.gps_long, self.accel_lat, self.accel_long, self.accel_vert, current_time)
             await asyncio.sleep(0.1)
