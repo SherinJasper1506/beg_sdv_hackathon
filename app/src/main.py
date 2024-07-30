@@ -63,14 +63,14 @@ class SampleApp(VehicleApp):
     
     async def run_get_data(self):
         while True:
-            self.accel_lat = await self.Vehicle.Acceleration.Lateral.get().value
-            self.accel_long = await self.Vehicle.Acceleration.Longitudinal.get().value
-            self.accel_vert = await self.Vehicle.Acceleration.Vertical.get().value
-            self.gps_lat = await self.Vehicle.CurrentLocation.Latitude.get().value
-            self.gps_long = await self.Vehicle.CurrentLocation.Longitude.get().value
+            self.accel_lat = await self.Vehicle.Acceleration.Lateral.get()
+            self.accel_long = await self.Vehicle.Acceleration.Longitudinal.get()
+            self.accel_vert = await self.Vehicle.Acceleration.Vertical.get()
+            self.gps_lat = await self.Vehicle.CurrentLocation.Latitude.get()
+            self.gps_long = await self.Vehicle.CurrentLocation.Longitude.get()
             current_time = (int(time.time()*1000) -20)
             #print accel and gps
-            print("accel_lat: ", self.accel_lat)
+            print("accel_lat: ", self.accel_lat.value)
             print("accel_long: ", self.accel_long)
             print("accel_vert: ", self.accel_vert)
             print("gps_lat: ", self.gps_lat)
