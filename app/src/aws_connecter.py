@@ -10,6 +10,7 @@ SUBSCRIBE_TOPIC = "downloadStatus/" + THING_NAME + "/req"
 PUBLISH_TOPIC = "sdk/test/python"
 PUBLISH_GPS_TOPIC = "sdv/gps"
 PUBLISH_GPS_ACCEL_TOPIC = "sdv/combined"
+PUBLISH_EVENT1_TOPIC = "sdv/event1"
 IOT_CORE_ENDPOINT = "a1k4mu7a9eqjbq-ats.iot.eu-central-1.amazonaws.com"
 CA_CERT = "/dist/src/certs/AmazonRootCA1.pem"
 CERT_FILE = "/dist/src/certs/cert_file.pem.crt"
@@ -78,37 +79,6 @@ class AwsConnector:
             }
             mqtt_client.publish(PUBLISH_TOPIC, payload=json.dumps(response))
 
-    def publish_message(self, accel_x, accel_y, accel_z):
-        message_json = json.dumps(
-                {
-                    "time": (int(time.time()*1000) -20 ) ,
-                    "accel_x": accel_x,
-                    "accel_y": accel_y,
-                    "accel_z": accel_z,
-                    "hostname": "rcu_car"
-                }, indent=2
-            )
-        # print(message_json)
-        self.mqtt_client.publish(
-                topic=PUBLISH_TOPIC,
-                payload=message_json)
-    
-    def publish_gps_message(self, lat, long):
-        print("pub gps data")
-        message_json = json.dumps(
-                {
-                    "time": (int(time.time()*1000) -20) ,
-                    "lat": lat,
-                    "long": long,
-                    "hostname": "rcu_car"
-                }, indent=2
-            )
-        # print(message_json)
-        self.mqtt_client.publish(
-                topic=PUBLISH_GPS_TOPIC,
-                payload=message_json)
-
-
     def publish_gps_accel_message(self, lat, long, accel_x, accel_y, accel_z, current_time=0):
         # print("pub gps and data")
         if current_time != 0:
@@ -127,6 +97,25 @@ class AwsConnector:
         print(message_json)
         self.mqtt_client.publish(
                 topic=PUBLISH_GPS_ACCEL_TOPIC,
+                payload=message_json)
+
+    def publish_event1_message(self, lat, long, accel_x, accel_y, accel_z, current_time=0):
+        # print("pub gps and data")
+        if current_time != 0:
+            current_time = (int(time.time()*1000) -20)
+        message_json = json.dumps(
+                {
+                    "time": current_time,
+                    "lat": lat,
+                    "long": long,
+                    "accel_x": accel_x,
+                    "accel_y": accel_y,
+                    "accel_z": accel_z,
+                    "hostname": "rcu_car"
+                }, indent=2
+            )
+        self.mqtt_client.publish(
+                topic=PUBLISH_EVENT1_TOPIC,
                 payload=message_json)
 
 # aws_connector = AwsConnector()

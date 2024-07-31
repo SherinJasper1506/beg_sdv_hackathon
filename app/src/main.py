@@ -76,7 +76,14 @@ class SampleApp(VehicleApp):
             self.gps_long = long_obj.value
             if self.aws_connector.status:
                 self.aws_connector.publish_gps_accel_message(self.gps_lat, self.gps_long, self.accel_lat, self.accel_long, self.accel_vert, current_time)
+            if self.check_for_event1(self.accel_vert):
+                self.aws_connector.publish_event1_message(self.gps_lat, self.gps_long, self.accel_lat, self.accel_long, self.accel_vert, current_time)
             await asyncio.sleep(0.1)
+
+    def check_for_event1(self, accel_vert):
+        if accel_vert > 1.10:
+            return True
+        return False
 
 
     def post_to_firebase(self, latitude, longitude, accelerometer_vert_value):
@@ -98,72 +105,19 @@ class SampleApp(VehicleApp):
         self.aws_connector.start_mqtt()
 
 
-    async def on_start_m(self):
-        """Run when the vehicle app starts"""
-        print("on_start before")
-        await self.Vehicle.Acceleration.Lateral.subscribe(self.on_accel_lat_change)
-        await self.Vehicle.Acceleration.Longitudinal.subscribe(
-            self.on_accel_long_change
-        )
-        await self.Vehicle.Acceleration.Vertical.subscribe(self.on_accel_vert_change)
-        await self.Vehicle.CurrentLocation.Latitude.subscribe(self.on_gps_lat_change)
-        await self.Vehicle.CurrentLocation.Longitude.subscribe(self.on_gps_long_change)
-        # await self.Vehicle.Speed.subscribe(self.on_speed_change)
-        #
-        print("on start done")
-
-    async def on_gps_lat_change(self, data: DataPointReply):
-        self.gps_lat = data.get(self.Vehicle.CurrentLocation.Latitude).value
-        # await self.pub_gps_data()
-        # if self.count == 0:
-        #     self.pub_gps_data()
-        #     self.count += 1
-        await self.pub_gps_data()
-        # await self.pub_gps_accel_data()
-
-
-
-    async def on_gps_long_change(self, data: DataPointReply):
-        self.gps_long = data.get(self.Vehicle.CurrentLocation.Longitude).value
-        await self.pub_gps_data()
-        # await self.pub_gps_accel_data()
-
-
-
-    async def on_accel_lat_change(self, data: DataPointReply):
-        self.accel_lat = data.get(self.Vehicle.Acceleration.Lateral).value
-
-        await self.pub_accel_data()
-        await self.pub_gps_accel_data()
-
-
-    async def on_accel_long_change(self, data: DataPointReply):
-        self.accel_long = data.get(self.Vehicle.Acceleration.Longitudinal).value
-        # print("on_accel_long_change")
-        # print(self.accel_long)
-        await self.pub_accel_data()
-        await self.pub_gps_accel_data()
-
-
-    async def on_accel_vert_change(self, data: DataPointReply):
-        self.accel_vert = data.get(self.Vehicle.Acceleration.Vertical).value
-        # print("on_accel_vert_change")
-        # print(self.accel_vert)
-        await self.pub_accel_data()
-        await self.pub_gps_accel_data()
-
-    async def pub_accel_data(self):
-        if self.aws_connector.status:
-            print("pub_accel_data")
-            self.aws_connector.publish_message(self.accel_lat, self.accel_long, self.accel_vert)
-
-    async def pub_gps_data(self):
-        if self.aws_connector.status:
-            self.aws_connector.publish_gps_message(self.gps_lat, self.gps_long)
-    
-    async def pub_gps_accel_data(self):
-        if self.aws_connector.status:
-            self.aws_connector.publish_gps_accel_message(self.gps_lat, self.gps_long, self.accel_lat, self.accel_long, self.accel_vert)
+    # async def on_start_m(self):
+    #     """Run when the vehicle app starts"""
+    #     print("on_start before")
+    #     await self.Vehicle.Acceleration.Lateral.subscribe(self.on_accel_lat_change)
+    #     await self.Vehicle.Acceleration.Longitudinal.subscribe(
+    #         self.on_accel_long_change
+    #     )
+    #     await self.Vehicle.Acceleration.Vertical.subscribe(self.on_accel_vert_change)
+    #     await self.Vehicle.CurrentLocation.Latitude.subscribe(self.on_gps_lat_change)
+    #     await self.Vehicle.CurrentLocation.Longitude.subscribe(self.on_gps_long_change)
+    #     # await self.Vehicle.Speed.subscribe(self.on_speed_change)
+    #     #
+    #     print("on start done")
 
 async def main():
     """Main function"""
