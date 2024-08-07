@@ -100,7 +100,7 @@ class AwsConnector:
                 payload=message_json)
 
     def publish_event1_message(self, lat, long, accel_x, accel_y, accel_z, current_time=0):
-        # print("pub gps and data")
+        print("event registered")
         if current_time != 0:
             current_time = (int(time.time()*1000) -20)
         message_json = json.dumps(
