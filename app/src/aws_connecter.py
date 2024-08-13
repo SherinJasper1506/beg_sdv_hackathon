@@ -81,8 +81,6 @@ class AwsConnector:
 
     def publish_gps_accel_message(self, data_dict):
         # print("pub gps and data")
-        if current_time != 0:
-            current_time = (int(time.time()*1000) -20)
         message_json = json.dumps(data_dict, indent=2
             )
         print(message_json)
@@ -92,8 +90,6 @@ class AwsConnector:
 
     def publish_event1_message(self, data_dict):
         print("event registered")
-        if current_time != 0:
-            current_time = (int(time.time()*1000) -20)
         message_json = json.dumps(data_dict, indent=2)
         self.mqtt_client.publish(
                 topic=PUBLISH_EVENT1_TOPIC,
