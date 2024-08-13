@@ -116,9 +116,9 @@ class SampleApp(VehicleApp):
         data_dict['time'] = current_time
         data_dict['lat'] = self.gps_lat
         data_dict['long'] = self.gps_long
-        data_dict['accel_lat'] = self.accel_lat
-        data_dict['accel_long'] = self.accel_long
-        data_dict['accel_vert'] = self.accel_vert
+        data_dict['accel_x'] = self.accel_lat
+        data_dict['accel_y'] = self.accel_long
+        data_dict['accel_z'] = self.accel_vert
         data_dict['vehicle_speed'] = self.vehicle_speed
         data_dict['vehicle_wh_f_l'] = self.vehicle_wh_f_l
         data_dict['vehicle_wh_f_r'] = self.vehicle_wh_f_r
