@@ -79,41 +79,22 @@ class AwsConnector:
             }
             mqtt_client.publish(PUBLISH_TOPIC, payload=json.dumps(response))
 
-    def publish_gps_accel_message(self, lat, long, accel_x, accel_y, accel_z, current_time=0):
+    def publish_gps_accel_message(self, data_dict):
         # print("pub gps and data")
         if current_time != 0:
             current_time = (int(time.time()*1000) -20)
-        message_json = json.dumps(
-                {
-                    "time": current_time,
-                    "lat": lat,
-                    "long": long,
-                    "accel_x": accel_x,
-                    "accel_y": accel_y,
-                    "accel_z": accel_z,
-                    "hostname": "rcu_car"
-                }, indent=2
+        message_json = json.dumps(data_dict, indent=2
             )
         print(message_json)
         self.mqtt_client.publish(
                 topic=PUBLISH_GPS_ACCEL_TOPIC,
                 payload=message_json)
 
-    def publish_event1_message(self, lat, long, accel_x, accel_y, accel_z, current_time=0):
+    def publish_event1_message(self, data_dict):
         print("event registered")
         if current_time != 0:
             current_time = (int(time.time()*1000) -20)
-        message_json = json.dumps(
-                {
-                    "time": current_time,
-                    "lat": lat,
-                    "long": long,
-                    "accel_x": accel_x,
-                    "accel_y": accel_y,
-                    "accel_z": accel_z,
-                    "hostname": "rcu_car"
-                }, indent=2
-            )
+        message_json = json.dumps(data_dict, indent=2)
         self.mqtt_client.publish(
                 topic=PUBLISH_EVENT1_TOPIC,
                 payload=message_json)

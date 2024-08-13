@@ -54,6 +54,13 @@ class SampleApp(VehicleApp):
         self.aws_connector = None
         self.aws_connected = False
         self.count = 0
+        self.vehicle_speed = 0
+        self.vehicle_wh_f_l = 0
+        self.vehicle_wh_f_r = 0
+        self.vehicle_wh_r_l = 0
+        self.vehicle_wh_r_r = 0
+        self.vehicle_break = 0
+        self.vehicle_steering = 0
         # asyncio.create_task(self.on_start_m())
         asyncio.create_task(self.start_aws())
         asyncio.create_task(self.run_get_data())
@@ -74,11 +81,61 @@ class SampleApp(VehicleApp):
             self.accel_vert = accel_vert_obj.value
             self.gps_lat = lat_obj.value
             self.gps_long = long_obj.value
+            self.get_can_data()
+            data_dict = {}
+            self.construct_dict(data_dict, current_time)
             if self.aws_connector.status:
-                self.aws_connector.publish_gps_accel_message(self.gps_lat, self.gps_long, self.accel_lat, self.accel_long, self.accel_vert, current_time)
+                self.aws_connector.publish_gps_accel_message(data_dict)
             if self.check_for_event1(self.accel_vert):
-                self.aws_connector.publish_event1_message(self.gps_lat, self.gps_long, self.accel_lat, self.accel_long, self.accel_vert, current_time)
+                self.aws_connector.publish_event1_message(data_dict)
             await asyncio.sleep(0.1)
+
+
+    def get_can_data(self):
+        self.set_can_default_values()
+        try:
+            vehicle_speed_obj = self.Vehicle.Speed.get()
+            vehicle_wh_f_l_obj = self.Vehicle.Chassis.Axle.Row1.Wheel.Left.Speed.get()
+            vehicle_wh_f_r_obj = self.Vehicle.Chassis.Axle.Row1.Wheel.Right.Speed.get()
+            vehicle_wh_r_l_obj = self.Vehicle.Chassis.Axle.Row2.Wheel.Left.Speed.get()
+            vehicle_wh_r_r_obj = self.Vehicle.Chassis.Axle.Row2.Wheel.Right.Speed.get()
+            vehicle_break_obj = self.Vehicle.Body.Lights.Brake.IsActive.get()
+            vehicle_eng_speed_obj = self.Vehicle.OBD.EngineSpeedget()
+            self.vehicle_speed = vehicle_speed_obj.value
+            self.vehicle_wh_f_l = vehicle_wh_f_l_obj.value
+            self.vehicle_wh_f_r = vehicle_wh_f_r_obj.value
+            self.vehicle_wh_r_l = vehicle_wh_r_l_obj.value
+            self.vehicle_wh_r_r = vehicle_wh_r_r_obj.value
+            self.vehicle_break = vehicle_break_obj.value
+            self.vehicle_eng_speed = vehicle_eng_speed_obj.value
+       except Exception as e:
+            print(e)
+            print("Error in getting CAN data")
+
+    def construct_dict(self, data_dict, current_time):
+        data_dict['time'] = current_time,
+        data_dict['lat'] = self.gps_lat
+        data_dict['long'] = self.gps_long
+        data_dict['accel_lat'] = self.accel_lat
+        data_dict['accel_long'] = self.accel_long
+        data_dict['accel_vert'] = self.accel_vert
+        data_dict['vehicle_speed'] = self.vehicle_speed
+        data_dict['vehicle_wh_f_l'] = self.vehicle_wh_f_l
+        data_dict['vehicle_wh_f_r'] = self.vehicle_wh_f_r
+        data_dict['vehicle_wh_r_l'] = self.vehicle_wh_r_l
+        data_dict['vehicle_wh_r_r'] = self.vehicle_wh_r_r
+        data_dict['vehicle_break'] = self.vehicle_break
+        data_dict['vehicle_eng_speed'] = self.vehicle_eng_speed
+        data_dict['hostname'] = "rcu_car"
+
+    def set_can_default_values(self):
+        self.vehicle_speed = -1
+        self.vehicle_wh_f_l = -1
+        self.vehicle_wh_f_r = -1
+        self.vehicle_wh_r_l = -1
+        self.vehicle_wh_r_r = -1
+        self.vehicle_break = False
+        self.vehicle_eng_speed = -1
 
     def check_for_event1(self, accel_vert):
         if accel_vert > 1.10:
