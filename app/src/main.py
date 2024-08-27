@@ -38,7 +38,7 @@ logging.setLogRecordFactory(get_opentelemetry_log_factory())
 logging.basicConfig(format=get_opentelemetry_log_format())
 logging.getLogger().setLevel("DEBUG")
 logger = logging.getLogger(__name__)
-
+GET_MANUAL_EVENT_TOPIC = "pothole/event1"
 
 
 class SampleApp(VehicleApp):
@@ -161,6 +161,11 @@ class SampleApp(VehicleApp):
         self.aws_connector = AwsConnector()
         self.aws_connector.start_mqtt()
 
+
+    @subscribe_topic(GET_MANUAL_EVENT_TOPIC):
+    async def on_get_speed_request_received(self, data: str) -> None:
+        print("Received get speed request")
+        
 
     # async def on_start_m(self):
     #     """Run when the vehicle app starts"""

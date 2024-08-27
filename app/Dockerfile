@@ -71,5 +71,5 @@ COPY ./app /dist
 ENV SDV_MIDDLEWARE_TYPE="native"
 ENV SDV_VEHICLEDATABROKER_ADDRESS="grpc://localhost:55555"
 
-# CMD ["bash"]
-CMD ["python3","/dist/src/main.py"]
+CMD ["bash"]
+# CMD ["python3","/dist/src/main.py"]
