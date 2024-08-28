@@ -28,7 +28,7 @@ from velocitas_sdk.util.log import (  # type: ignore
     get_opentelemetry_log_format,
 )
 
-from velocitas_sdk.vehicle_app import VehicleApp
+from velocitas_sdk.vehicle_app import VehicleApp, subscribe_topic
 from velocitas_sdk.vdb.reply import DataPointReply
 from aws_connecter import AwsConnector
 
@@ -66,6 +66,7 @@ class SampleApp(VehicleApp):
         asyncio.create_task(self.run_get_data())
         # asyncio.create_task(self.test_while())
         # asyncio.create_task(self.test_while2()
+        self.event_1 = False
 
     
     async def run_get_data(self):
@@ -127,6 +128,7 @@ class SampleApp(VehicleApp):
         # data_dict['vehicle_break'] = self.vehicle_break
         data_dict['vehicle_eng_speed'] = self.vehicle_eng_speed
         data_dict['hostname'] = "rcu_car"
+        data_dict['event1'] = self.event_1
 
     def set_can_default_values(self):
         self.vehicle_speed = -1
@@ -162,10 +164,13 @@ class SampleApp(VehicleApp):
         self.aws_connector.start_mqtt()
 
 
-    @subscribe_topic(GET_MANUAL_EVENT_TOPIC):
-    async def on_get_speed_request_received(self, data: str) -> None:
-        print("Received get speed request")
-        
+    @subscribe_topic(GET_MANUAL_EVENT_TOPIC)
+    async def on_get_event1(self, data: str) -> None:
+        print("Received on_get_event1")
+        if data == "bump_start":
+            self.event_1 = True
+        if data == "bump_stop":
+            self.event_1 = False
 
     # async def on_start_m(self):
     #     """Run when the vehicle app starts"""

@@ -1,5 +1,5 @@
 ====================== create commands ========================
-kanto-cm create --name pothole-app --network=host --t --i  --mp="/tmp:/tmp"  ghcr.io/sherinjasper1506/beg_sdv_hackathon:arm64@sha256:f89e49fc5a8a43642c9918215cbf8c9785c1f8e5155bb4bae05f73f3c5624749
+kanto-cm create --name pothole-app --network=host --t --i  --mp="/tmp:/tmp"  ghcr.io/sherinjasper1506/beg_sdv_hackathon:arm64@sha256:1cd07632cddda25e0030169b959f3f2687ca9151aaa14e819abe855e140715b0
 
 kanto-cm create --name gps-data --network=host --t --i  --mp="/tmp:/tmp"  --devices=/dev/ttymxc3:/dev/ttymxc3  --devices=/dev/owa5x_gpio:/dev/owa5x_gpio ghcr.io/ronit-wilson-r/gps-accel-data:arm64@sha256:97e989e9d7b07cd7df2863d3a51e33b7d84ff71697a4dc8511a3cd6789bd1978
 
@@ -8,6 +8,10 @@ kanto-cm create --name  databroker --network=host ghcr.io/eclipse/kuksa.val/data
 kanto-cm create --name  databroker-cli --network=host --t --i ghcr.io/eclipse/kuksa.val/databroker-cli:0.4.1
 
 old ids: a77479cfe3df75bd93d96a2dd674bc3115410a19dfe607767d300af28dd157dc
+
+kanto-cm create --name  can-provider-1  --network=host --t --i  --mp="/tmp:/tmp"  --devices=/dev/ttymxc3:/dev/ttymxc3  ghcr.io/ronit-wilson-r/kuksa-can-provider-data:arm64
+
+kanto-cm create --name event1 --network=host --t --i  --mp="/tmp:/tmp"  --devices=/dev/ttymxc3:/dev/ttymxc3  --devices=/dev/owa5x_gpio:/dev/owa5x_gpio ghcr.io/ronit-wilson-r/gps-accel-data:arm64@sha256:4a143a4abe004bdd562cf661769d90d14b3e5708ffb8422ae0633e023ada3e98
 
 ====================== start commands ========================
 
@@ -18,6 +22,9 @@ kanto-cm start --name  gps-data --a --i
 kanto-cm start --name  databroker
 
 kanto-cm start --name   databroker-cli --a --i
+
+
+kanto-cm start --name  can-provider-1 --a --i
 
 kanto-cm stop  -f --name pothole-app 
 
@@ -37,3 +44,9 @@ alias r1='python3 main.py'
 alias c2='rm aws_connecter.py'
 
 alias n2='nano aws_connecter.py'
+
+alias start1='kanto-cm start --name  pothole-app --a --i'
+
+alias stop1='kanto-cm stop  -f --name pothole-app'
+
+alias remove1='kanto-cm remove  -f --name pothole-app'
