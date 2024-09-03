@@ -20,6 +20,7 @@ import logging
 import signal
 import time
 from datetime import datetime
+import threading
 
 import requests
 from vehicle import Vehicle, vehicle  # type: ignore
@@ -61,13 +62,14 @@ class SampleApp(VehicleApp):
         self.vehicle_wh_r_r = 0
         self.vehicle_break = 0
         self.vehicle_steering = 0
-        # asyncio.create_task(self.on_start_m())
         asyncio.create_task(self.start_aws())
         asyncio.create_task(self.run_get_data())
-        # asyncio.create_task(self.test_while())
-        # asyncio.create_task(self.test_while2()
         self.event_1 = False
-
+        self.vehicle_speed_arr = []
+        self.vehicle_speed_avg = 0
+        self._accel_z_arr = []
+        self.vehicle_wh_diff = []
+        self.mqtt_client = None
     
     async def run_get_data(self):
         while True:
@@ -84,12 +86,36 @@ class SampleApp(VehicleApp):
             self.gps_long = long_obj.value
             await self.get_can_data()
             data_dict = {}
+            self.fill_data_arrays()
+            self.event_thread = threading.Thread(target=self.calculate_event, args=(data_dict,)).start()
             self.construct_dict(data_dict, current_time)
             if self.aws_connector.status:
                 self.aws_connector.publish_gps_accel_message(data_dict)
-            if self.check_for_event1(self.accel_vert):
-                self.aws_connector.publish_event1_message(data_dict)
-            await asyncio.sleep(0.1)
+            self.event_thread.join()
+            await asyncio.sleep(0.02)
+
+
+    async def calculate_event(self, data_dict):
+        is_accel_z_envent = False
+        is_vehicle_decel = False
+        # if self.vehicle_speed == 0:
+        #     return
+        min_val, max_val = self.find_min_max(self._accel_z_arr)
+        if max_val - min_val > 0.5:
+            is_accel_z_envent = True
+        else:
+            return
+        if is_accel_z_envent:
+            vehicle_accel = self.get_vehicle_accel(self.vehicle_speed_arr)
+            if vehicle_accel < -0.2:
+                is_vehicle_decel = True
+            else:
+                return
+        is_vehicle_wh_speed_diff = max(self.vehicle_wh_diff)
+        if not is_vehicle_wh_speed_diff:
+            return
+        if self.aws_connector.status:
+            self.aws_connector.publish_event1_message(data_dict)
 
 
     async def get_can_data(self):
@@ -112,6 +138,39 @@ class SampleApp(VehicleApp):
         except Exception as e:
             print(e)
             print("Error in getting CAN data")
+
+    def fill_data_arrays(self):
+        self.vehicle_speed_arr.append(self.vehicle_speed)
+        self._accel_z_arr.append(self.accel_vert)
+        self.vehcile_speed_avg = self.get_avg(self.vehicle_speed_arr)
+        if self.vehicle_wh_f_l == self.vehicle_wh_f_r and self.vehicle_wh_f_l == self.vehicle_wh_r_l and self.vehicle_wh_f_l == self.vehicle_wh_r_r:
+            self.vehicle_wh_diff.append(0)
+        else:
+            self.vehicle_wh_diff.append(1)
+        
+        if len(self.vehicle_speed_arr) > 20:
+            self.vehicle_speed_arr.pop(0)
+        if len(self._accel_z_arr) > 5:
+            self._accel_z_arr.pop(0)
+        if len(self.vehicle_wh_diff) > 3:
+            self.vehicle_wh_diff.pop(0)
+
+    def find_min_max(self, arr):
+        if len(arr) <= 5:
+            return 0, 0
+        min_val = min(arr)
+        max_val = max(arr)
+        return min_val, max_val
+    
+    def get_avg(self, arr):
+        if len(arr) == 0:
+            return 0
+        return sum(arr)/len(arr)
+
+    def get_vehicle_accel(self, arr):
+        if len(arr) < 2:
+            return 0
+        return (arr[len(arr)] - arr[len(arr)-1])
 
     def construct_dict(self, data_dict, current_time):
         data_dict['time'] = current_time
