@@ -96,21 +96,14 @@ class SampleApp(VehicleApp):
 
 
     async def calculate_event(self, data_dict):
-        is_accel_z_envent = False
-        is_vehicle_decel = False
         # if self.vehicle_speed == 0:
         #     return
         min_val, max_val = self.find_min_max(self._accel_z_arr)
         if max_val - min_val > 0.5:
-            is_accel_z_envent = True
-        else:
             return
-        if is_accel_z_envent:
-            vehicle_accel = self.get_vehicle_accel(self.vehicle_speed_arr)
-            if vehicle_accel < -0.2:
-                is_vehicle_decel = True
-            else:
-                return
+        vehicle_accel = self.get_vehicle_accel(self.vehicle_speed_arr)
+        if not vehicle_accel < -0.2:
+            return
         is_vehicle_wh_speed_diff = max(self.vehicle_wh_diff)
         if not is_vehicle_wh_speed_diff:
             return
