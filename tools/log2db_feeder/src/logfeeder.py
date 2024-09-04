@@ -1,7 +1,7 @@
 import csv
 import time
 from aws_connecter import AwsConnector
-csv_file_path = "../csv/4_07_24_11_52_am.csv"
+csv_file_path = "../csv/measurements_run_29_aug.csv"
 
 
 aws_connector = None
@@ -15,7 +15,9 @@ with open(csv_file_path, 'r') as file:
     csv_reader = csv.reader(file)
     for row in csv_reader:
         # ignore the header row
-        if row[0] == "Time":
+        if row[0] == "time":
             continue
-        aws_connector.publish_time_gps_accel_message(row[0], row[1], row[2], row[3], row[4], row[5])
-        time.sleep(0.1)
+        print(csv_reader.line_num)
+        aws_connector.publish_time_gps_accel_message(row[0], row[1], row[2], row[3], row[4], row[5],
+                                                      row[6], row[7], row[8], row[9], row[10], row[11], row[12])
+        time.sleep(0.05)

@@ -49,11 +49,13 @@ class eventApp():
             json_payload = json.loads(payload)
         except Exception as e:
             print("on_mqtt_message: Invalid JSON (most likely programming error)")
+        # print(json_payload)
         self.load_variables(json_payload)
         self.fill_data_arrays()
         data_dict = {}
-        time = int(payload["time"])
-        self.construct_dict(data_dict, time)
+        # time = int(payload["time"])
+        current_time = (int(time.time()*1000) -20)
+        self.construct_dict(data_dict, current_time)
         self.calculate_event(data_dict)
     
     def load_variables(self, payload):
@@ -68,10 +70,6 @@ class eventApp():
         self.vehicle_wh_r_l = float(payload["vehicle_wh_r_l"])
         self.vehicle_wh_r_r = float(payload["vehicle_wh_r_r"])
         self.vehicle_eng_speed = float(payload["vehicle_eng_speed"])
-        self.vehicle_speed_arr.append(self.vehicle_speed)
-        self.vehicle_speed_avg_arr.append(sum(self.vehicle_speed_arr)/len(self.vehicle_speed_arr))
-        self._accel_z_arr.append(self.accel_vert)
-        self.vehicle_wh_diff.append(abs(self.vehicle_wh_f_l - self.vehicle_wh_f_r))
         
 
     def fill_data_arrays(self):
@@ -106,24 +104,35 @@ class eventApp():
         return sum(arr)/len(arr)
 
     def get_vehicle_accel(self, arr):
-        if len(arr) < 2:
+        if len(arr) < 2 :
             return 0
-        return (arr[len(arr)] - arr[len(arr)-1])
+        print(len(arr))
+        return (arr[len(arr)-1] - arr[len(arr)-2])
     
     def calculate_event(self, data_dict):
         # if self.vehicle_speed == 0:
         #     return
         min_val, max_val = self.find_min_max(self._accel_z_arr)
         if max_val - min_val > 0.5:
+            print(self._accel_z_arr)
+            print("return at accel_z check")
             return
         vehicle_accel = self.get_vehicle_accel(self.vehicle_speed_avg_arr)
         if not vehicle_accel < -0.2:
+            print("return at speed check")
             return
         is_vehicle_wh_speed_diff = max(self.vehicle_wh_diff)
         if not is_vehicle_wh_speed_diff:
+            print("return at wh diff check")
             return
         if self.aws_connector.status:
-            self.aws_connector.publish_event1_message(data_dict)
+            sample_dict = {"event": "event1"}
+            try:
+                self.aws_connector.publish_event1_message(data_dict)
+            except Exception as e:
+                print("data dict")
+                print(data_dict)
+                print(e)
 
     def construct_dict(self, data_dict, current_time):
         data_dict['time'] = current_time

@@ -7,10 +7,7 @@ import paho.mqtt.client as mqtt
 
 THING_NAME = "rcu_car"
 SUBSCRIBE_TOPIC = "test/data1"
-PUBLISH_TOPIC = "sdk/test/python"
-PUBLISH_GPS_TOPIC = "sdv/gps"
-PUBLISH_GPS_ACCEL_TOPIC = "sdv/combined"
-PUBLISH_EVENT1_TOPIC = "sdv/event1"
+PUBLISH_TEST_EVENT1_TOPIC = "sdv/event1"
 IOT_CORE_ENDPOINT = "a1k4mu7a9eqjbq-ats.iot.eu-central-1.amazonaws.com"
 CA_CERT = "./certs/AmazonRootCA1.pem"
 CERT_FILE = "./certs/cert_file.pem.crt"
@@ -49,7 +46,7 @@ class AwsConnector:
         print("connected to endpoint with result code", rc)
         mqtt_client.is_connected = True
         mqtt_client.publish(
-            PUBLISH_TOPIC,
+            PUBLISH_TEST_EVENT1_TOPIC,
             payload=json.dumps(
                 {
                     "cmd": "init",
@@ -72,32 +69,12 @@ class AwsConnector:
         payload = msg.payload
         if self.__on_msg_cb is not None:
             self.__on_msg_cb(payload)
-        # try:
-        #     json_payload = json.loads(payload)
-        # except json.decoder.JSONDecodeError:
-        #     print("on_mqtt_message: Invalid JSON (most likely programming error)")
-        #     return
-        # if json_payload["cmd"] == "download_config":
-        #     response = {
-        #         "cmd": "download_config",
-        #         "success": True,
-        #     }
-        #     mqtt_client.publish(PUBLISH_TOPIC, payload=json.dumps(response))
-
-    def publish_gps_accel_message(self, data_dict):
-        # print("pub gps and data")
-        message_json = json.dumps(data_dict, indent=2
-            )
-        print(message_json)
-        self.mqtt_client.publish(
-                topic=PUBLISH_GPS_ACCEL_TOPIC,
-                payload=message_json)
 
     def publish_event1_message(self, data_dict):
         print("event registered")
         message_json = json.dumps(data_dict, indent=2)
         self.mqtt_client.publish(
-                topic=PUBLISH_EVENT1_TOPIC,
+                topic=PUBLISH_TEST_EVENT1_TOPIC,
                 payload=message_json)
 
 # aws_connector = AwsConnector()
