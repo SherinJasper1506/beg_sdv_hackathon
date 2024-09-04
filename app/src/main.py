@@ -66,7 +66,7 @@ class SampleApp(VehicleApp):
         asyncio.create_task(self.run_get_data())
         self.event_1 = False
         self.vehicle_speed_arr = []
-        self.vehicle_speed_avg = 0
+        self.vehicle_speed_avg_arr = []
         self._accel_z_arr = []
         self.vehicle_wh_diff = []
         self.mqtt_client = None
@@ -87,7 +87,8 @@ class SampleApp(VehicleApp):
             await self.get_can_data()
             data_dict = {}
             self.fill_data_arrays()
-            self.event_thread = threading.Thread(target=self.calculate_event, args=(data_dict,)).start()
+            self.event_thread = threading.Thread(target=self.calculate_event, args=(data_dict,))
+            self.event_thread.start()
             self.construct_dict(data_dict, current_time)
             if self.aws_connector.status:
                 self.aws_connector.publish_gps_accel_message(data_dict)
@@ -101,7 +102,7 @@ class SampleApp(VehicleApp):
         min_val, max_val = self.find_min_max(self._accel_z_arr)
         if max_val - min_val > 0.5:
             return
-        vehicle_accel = self.get_vehicle_accel(self.vehicle_speed_arr)
+        vehicle_accel = self.get_vehicle_accel(self.vehicle_speed_avg_arr)
         if not vehicle_accel < -0.2:
             return
         is_vehicle_wh_speed_diff = max(self.vehicle_wh_diff)
@@ -135,14 +136,17 @@ class SampleApp(VehicleApp):
     def fill_data_arrays(self):
         self.vehicle_speed_arr.append(self.vehicle_speed)
         self._accel_z_arr.append(self.accel_vert)
-        self.vehcile_speed_avg = self.get_avg(self.vehicle_speed_arr)
+        speed_avg = self.get_avg(self.vehicle_speed_arr)
+        self.vehicle_speed_avg_arr.append(speed_avg)
         if self.vehicle_wh_f_l == self.vehicle_wh_f_r and self.vehicle_wh_f_l == self.vehicle_wh_r_l and self.vehicle_wh_f_l == self.vehicle_wh_r_r:
             self.vehicle_wh_diff.append(0)
         else:
             self.vehicle_wh_diff.append(1)
         
-        if len(self.vehicle_speed_arr) > 20:
+        if len(self.vehicle_speed_arr) > 10:
             self.vehicle_speed_arr.pop(0)
+        if len(self.vehicle_speed_avg_arr) > 2:
+            self.vehicle_speed_avg_arr.pop(0)
         if len(self._accel_z_arr) > 5:
             self._accel_z_arr.pop(0)
         if len(self.vehicle_wh_diff) > 3:
