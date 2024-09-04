@@ -87,9 +87,9 @@ class SampleApp(VehicleApp):
             await self.get_can_data()
             data_dict = {}
             self.fill_data_arrays()
+            self.construct_dict(data_dict, current_time)
             self.event_thread = threading.Thread(target=self.calculate_event, args=(data_dict,))
             self.event_thread.start()
-            self.construct_dict(data_dict, current_time)
             if self.aws_connector.status:
                 self.aws_connector.publish_gps_accel_message(data_dict)
             self.event_thread.join()
