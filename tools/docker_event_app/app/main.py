@@ -1,4 +1,3 @@
-
 from aws_connecter import AwsConnector
 import json
 import time
@@ -92,7 +91,7 @@ class eventApp():
             self.vehicle_wh_diff.pop(0)   
 
     def find_min_max(self, arr):
-        if len(arr) <= 5:
+        if len(arr) < 5:
             return 0, 0
         min_val = min(arr)
         max_val = max(arr)
@@ -113,12 +112,15 @@ class eventApp():
         # if self.vehicle_speed == 0:
         #     return
         min_val, max_val = self.find_min_max(self._accel_z_arr)
-        if max_val - min_val > 0.5:
+        if  max_val - min_val < 0.4:
             print(self._accel_z_arr)
+            print(max_val)
+            print(min_val)
+            print(max_val-min_val)
             print("return at accel_z check")
             return
         vehicle_accel = self.get_vehicle_accel(self.vehicle_speed_avg_arr)
-        if not vehicle_accel < -0.2:
+        if vehicle_accel > -0.2:
             print("return at speed check")
             return
         is_vehicle_wh_speed_diff = max(self.vehicle_wh_diff)
@@ -130,6 +132,8 @@ class eventApp():
             try:
                 self.aws_connector.publish_event1_message(data_dict)
             except Exception as e:
+                print("data dict")
+                print(data_dict)
                 print(e)
 
     def construct_dict(self, data_dict, current_time):
@@ -148,5 +152,6 @@ class eventApp():
         data_dict['vehicle_eng_speed'] = self.vehicle_eng_speed
         data_dict['hostname'] = "rcu_car"
 
+print("run app")
 event_app = eventApp()
 event_app.start()
