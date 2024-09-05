@@ -5,9 +5,9 @@ import threading
 
 import paho.mqtt.client as mqtt
 
-THING_NAME = "rcu_lab"
+THING_NAME = "rcu_lab_2"
 SUBSCRIBE_TOPIC = "downloadStatus/" + THING_NAME + "/req"
-PUBLISH_TOPIC = "test/data1"
+PUBLISH_TOPIC = "test/data2"
 IOT_CORE_ENDPOINT = "a1k4mu7a9eqjbq-ats.iot.eu-central-1.amazonaws.com"
 CA_CERT = "./certs/AmazonRootCA1.pem"
 CERT_FILE = "./certs/cert_file.pem.crt"

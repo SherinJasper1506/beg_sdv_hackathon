@@ -6,11 +6,12 @@ import threading
 import paho.mqtt.client as mqtt
 
 THING_NAME = "rcu_car"
-SUBSCRIBE_TOPIC = "downloadStatus/" + THING_NAME + "/req"
+SUBSCRIBE_TOPIC_test = "test/data1"
+SUBSCRIBE_TOPIC_event_2 = "sdv/event2_switch"
 PUBLISH_TOPIC = "sdk/test/python"
 PUBLISH_GPS_TOPIC = "sdv/gps"
 PUBLISH_GPS_ACCEL_TOPIC = "sdv/combined"
-PUBLISH_EVENT1_TOPIC = "sdv/event1"
+PUBLISH_EVENT2_TOPIC = "sdv/event2"
 IOT_CORE_ENDPOINT = "a1k4mu7a9eqjbq-ats.iot.eu-central-1.amazonaws.com"
 CA_CERT = "/dist/src/certs/AmazonRootCA1.pem"
 CERT_FILE = "/dist/src/certs/cert_file.pem.crt"
@@ -31,13 +32,16 @@ class AwsConnector:
         self.__mqtt_client.on_subscribe = self.on_subscribe
         self.mqtt_thread = threading.Thread(target=self.run_mqtt)
         self.mqtt_client = None
+        self.__on_msg_cb = None
 
     def run_mqtt(self):
         self.__mqtt_client.connect(IOT_CORE_ENDPOINT, 8883, 60)
         self.__mqtt_client.loop_forever()
         while(1):
             time.sleep(1)
-            
+
+    def set_on_message_callback(self, cb):
+        self.__on_msg_cb = cb            
     
     def start_mqtt(self):
         self.mqtt_thread.start()
@@ -45,17 +49,18 @@ class AwsConnector:
     def on_connect(self, mqtt_client, userdata, flags, rc, properties=None):
         print("connected to endpoint with result code", rc)
         mqtt_client.is_connected = True
-        mqtt_client.publish(
-            PUBLISH_TOPIC,
-            payload=json.dumps(
-                {
-                    "cmd": "init",
-                }
-            ),
-        )
-        print("subscribing to topic: ", SUBSCRIBE_TOPIC)
+        # mqtt_client.publish(
+        #     PUBLISH_TOPIC,
+        #     payload=json.dumps(
+        #         {
+        #             "cmd": "init",
+        #         }
+        #     ),
+        # )
+        print("subscribing to topic: ", SUBSCRIBE_TOPIC_test)
         self.status = True
-        mqtt_client.subscribe(SUBSCRIBE_TOPIC, qos=0, options=None, properties=None)
+        mqtt_client.subscribe(SUBSCRIBE_TOPIC_test, qos=0, options=None, properties=None)
+        mqtt_client.subscribe(SUBSCRIBE_TOPIC_event_2, qos=0, options=None, properties=None)
         self.mqtt_client = mqtt_client
 
     def on_disconnect(self, mqtt_client, userdata, rc):
@@ -67,17 +72,9 @@ class AwsConnector:
 
     def on_message(self, mqtt_client, userdata, msg):
         payload = msg.payload
-        try:
-            json_payload = json.loads(payload)
-        except json.decoder.JSONDecodeError:
-            print("on_mqtt_message: Invalid JSON (most likely programming error)")
-            return
-        if json_payload["cmd"] == "download_config":
-            response = {
-                "cmd": "download_config",
-                "success": True,
-            }
-            mqtt_client.publish(PUBLISH_TOPIC, payload=json.dumps(response))
+        topic = msg.topic
+        if self.__on_msg_cb is not None:
+            self.__on_msg_cb(payload, topic)
 
     def publish_gps_accel_message(self, data_dict):
         # print("pub gps and data")
@@ -88,11 +85,11 @@ class AwsConnector:
                 topic=PUBLISH_GPS_ACCEL_TOPIC,
                 payload=message_json)
 
-    def publish_event1_message(self, data_dict):
+    def publish_event2_message(self, data_dict):
         print("event registered")
         message_json = json.dumps(data_dict, indent=2)
         self.mqtt_client.publish(
-                topic=PUBLISH_EVENT1_TOPIC,
+                topic=PUBLISH_EVENT2_TOPIC,
                 payload=message_json)
 
 # aws_connector = AwsConnector()

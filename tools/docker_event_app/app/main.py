@@ -130,8 +130,6 @@ class eventApp():
             try:
                 self.aws_connector.publish_event1_message(data_dict)
             except Exception as e:
-                print("data dict")
-                print(data_dict)
                 print(e)
 
     def construct_dict(self, data_dict, current_time):

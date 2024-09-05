@@ -70,6 +70,7 @@ class SampleApp(VehicleApp):
         self._accel_z_arr = []
         self.vehicle_wh_diff = []
         self.mqtt_client = None
+        self.event2_run = False
     
     async def run_get_data(self):
         while True:
@@ -88,19 +89,21 @@ class SampleApp(VehicleApp):
             data_dict = {}
             self.fill_data_arrays()
             self.construct_dict(data_dict, current_time)
-            self.event_thread = threading.Thread(target=self.calculate_event, args=(data_dict,))
-            self.event_thread.start()
+            self.event_thread = None
+            if self.event2_run:
+                self.event_thread = threading.Thread(target=self.calculate_event, args=(data_dict,))
+                self.event_thread.start()
             if self.aws_connector.status:
                 self.aws_connector.publish_gps_accel_message(data_dict)
-            self.event_thread.join()
+            if self.event_thread:
+                self.event_thread.join()
             await asyncio.sleep(0.02)
 
 
-    async def calculate_event(self, data_dict):
-        # if self.vehicle_speed == 0:
-        #     return
+    def calculate_event(self, data_dict):
         min_val, max_val = self.find_min_max(self._accel_z_arr)
         if max_val - min_val > 0.5:
+            print("accel check")
             return
         vehicle_accel = self.get_vehicle_accel(self.vehicle_speed_avg_arr)
         if not vehicle_accel < -0.2:
@@ -109,7 +112,11 @@ class SampleApp(VehicleApp):
         if not is_vehicle_wh_speed_diff:
             return
         if self.aws_connector.status:
-            self.aws_connector.publish_event1_message(data_dict)
+            try:
+                print("event2")
+                self.aws_connector.publish_event2_message(data_dict)
+            except Exception as e:
+                print(e)
 
 
     async def get_can_data(self):
@@ -150,7 +157,7 @@ class SampleApp(VehicleApp):
         if len(self._accel_z_arr) > 5:
             self._accel_z_arr.pop(0)
         if len(self.vehicle_wh_diff) > 3:
-            self.vehicle_wh_diff.pop(0)
+            self.vehicle_wh_diff.pop(0)   
 
     def find_min_max(self, arr):
         if len(arr) <= 5:
@@ -165,9 +172,10 @@ class SampleApp(VehicleApp):
         return sum(arr)/len(arr)
 
     def get_vehicle_accel(self, arr):
-        if len(arr) < 2:
+        if len(arr) < 2 :
             return 0
-        return (arr[len(arr)] - arr[len(arr)-1])
+        print(len(arr))
+        return (arr[len(arr)-1] - arr[len(arr)-2])
 
     def construct_dict(self, data_dict, current_time):
         data_dict['time'] = current_time
@@ -217,6 +225,7 @@ class SampleApp(VehicleApp):
 
     async def start_aws(self):
         self.aws_connector = AwsConnector()
+        self.aws_connector.set_on_message_callback(self.on_message)
         self.aws_connector.start_mqtt()
 
 
@@ -228,19 +237,15 @@ class SampleApp(VehicleApp):
         if data == "bump_stop":
             self.event_1 = False
 
-    # async def on_start_m(self):
-    #     """Run when the vehicle app starts"""
-    #     print("on_start before")
-    #     await self.Vehicle.Acceleration.Lateral.subscribe(self.on_accel_lat_change)
-    #     await self.Vehicle.Acceleration.Longitudinal.subscribe(
-    #         self.on_accel_long_change
-    #     )
-    #     await self.Vehicle.Acceleration.Vertical.subscribe(self.on_accel_vert_change)
-    #     await self.Vehicle.CurrentLocation.Latitude.subscribe(self.on_gps_lat_change)
-    #     await self.Vehicle.CurrentLocation.Longitude.subscribe(self.on_gps_long_change)
-    #     # await self.Vehicle.Speed.subscribe(self.on_speed_change)
-    #     #
-    #     print("on start done")
+
+    def on_message(self, payload, topic):
+        print(topic)
+        if topic == "sdv/event2_switch":
+            json_payload = json.loads(payload)
+            if json_payload["status"] == "start":
+                self.event2_run = True
+            if json_payload["status"] == "stop":
+                self.event2_run = False
 
 async def main():
     """Main function"""
@@ -258,3 +263,5 @@ LOOP.close()
 
 # export SDV_MIDDLEWARE_TYPE="native"
 # export SDV_VEHICLEDATABROKER_ADDRESS="grpc://localhost:55555"
+
+
