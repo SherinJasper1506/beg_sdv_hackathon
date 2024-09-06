@@ -102,11 +102,11 @@ class SampleApp(VehicleApp):
 
     def calculate_event(self, data_dict):
         min_val, max_val = self.find_min_max(self._accel_z_arr)
-        if max_val - min_val > 0.5:
+        if  max_val - min_val < 0.4:
             print("accel check")
             return
         vehicle_accel = self.get_vehicle_accel(self.vehicle_speed_avg_arr)
-        if not vehicle_accel < -0.2:
+        if not vehicle_accel > -0.2:
             return
         is_vehicle_wh_speed_diff = max(self.vehicle_wh_diff)
         if not is_vehicle_wh_speed_diff:
@@ -160,7 +160,7 @@ class SampleApp(VehicleApp):
             self.vehicle_wh_diff.pop(0)   
 
     def find_min_max(self, arr):
-        if len(arr) <= 5:
+        if len(arr) < 5:
             return 0, 0
         min_val = min(arr)
         max_val = max(arr)
