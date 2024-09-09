@@ -8,6 +8,7 @@ import paho.mqtt.client as mqtt
 THING_NAME = "rcu_car"
 SUBSCRIBE_TOPIC_test = "test/data1"
 SUBSCRIBE_TOPIC_event_2 = "sdv/event2_switch"
+SUBSCRIBE_TOPIC_event_2_config = "sdv/event2_config"
 PUBLISH_TOPIC = "sdk/test/python"
 PUBLISH_GPS_TOPIC = "sdv/gps"
 PUBLISH_GPS_ACCEL_TOPIC = "sdv/combined"
@@ -61,6 +62,7 @@ class AwsConnector:
         self.status = True
         mqtt_client.subscribe(SUBSCRIBE_TOPIC_test, qos=0, options=None, properties=None)
         mqtt_client.subscribe(SUBSCRIBE_TOPIC_event_2, qos=0, options=None, properties=None)
+        mqtt_client.subscribe(SUBSCRIBE_TOPIC_event_2_config, qos=0, options=None, properties=None)
         self.mqtt_client = mqtt_client
 
     def on_disconnect(self, mqtt_client, userdata, rc):

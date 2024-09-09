@@ -71,6 +71,7 @@ class SampleApp(VehicleApp):
         self.vehicle_wh_diff = []
         self.mqtt_client = None
         self.event2_run = False
+        self.event2_config = {"accel_z_threshold" : 0.4, "vehicle_accel_threshold" : -0.2, "aceel_window" : 20}
     
     async def run_get_data(self):
         while True:
@@ -102,10 +103,10 @@ class SampleApp(VehicleApp):
 
     def calculate_event(self, data_dict):
         min_val, max_val = self.find_min_max(self._accel_z_arr)
-        if  max_val - min_val < 0.4:
+        if  max_val - min_val < self.event2_config.get("accel_z_threshold"):
             return
         vehicle_accel = self.get_vehicle_accel(self.vehicle_speed_avg_arr)
-        if vehicle_accel > -0.2:
+        if vehicle_accel > -self.event2_config.get("vehicle_accel_threshold")::
             return
         is_vehicle_wh_speed_diff = max(self.vehicle_wh_diff)
         if not is_vehicle_wh_speed_diff:
@@ -149,7 +150,7 @@ class SampleApp(VehicleApp):
         else:
             self.vehicle_wh_diff.append(1)
         
-        if len(self.vehicle_speed_arr) > 10:
+        if len(self.vehicle_speed_arr) > self.event2_config["accel_window"]:
             self.vehicle_speed_arr.pop(0)
         if len(self.vehicle_speed_avg_arr) > 2:
             self.vehicle_speed_avg_arr.pop(0)
@@ -239,12 +240,23 @@ class SampleApp(VehicleApp):
 
     def on_message(self, payload, topic):
         print(topic)
-        if topic == "sdv/event2_switch":
-            json_payload = json.loads(payload)
-            if json_payload["status"] == "start":
-                self.event2_run = True
-            if json_payload["status"] == "stop":
-                self.event2_run = False
+        try:
+            if topic == "sdv/event2_switch":
+                json_payload = json.loads(payload)
+                if json_payload["status"] == "start":
+                    self.event2_run = True
+                if json_payload["status"] == "stop":
+                    self.event2_run = False
+            if topic = "sdv/event2_config":
+                json_payload = json.loads(payload)
+                self.event2_config["accel_z_threshold"] = json_payload["accel_z_threshold"]
+                self.event2_config["vehicle_accel_threshold"] = json_payload["vehicle_accel_threshold"]
+                self.event2_config["accel_window"] = json_payload["vehicle_wh_speed_diff"]
+                print(self.event2_config)
+        except Exception as e:
+            print("Error in on_message")
+
+            
 
 async def main():
     """Main function"""
