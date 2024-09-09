@@ -5,7 +5,7 @@ import threading
 
 import paho.mqtt.client as mqtt
 
-THING_NAME = "rcu_car"
+THING_NAME = "rcu_test"
 SUBSCRIBE_TOPIC = "test/data"
 PUBLISH_TEST_EVENT1_TOPIC = "sdv/event1"
 IOT_CORE_ENDPOINT = "a1k4mu7a9eqjbq-ats.iot.eu-central-1.amazonaws.com"

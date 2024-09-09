@@ -71,7 +71,8 @@ class SampleApp(VehicleApp):
         self.vehicle_wh_diff = []
         self.mqtt_client = None
         self.event2_run = False
-        self.event2_config = {"accel_z_threshold" : 0.4, "vehicle_accel_threshold" : -0.2, "aceel_window" : 20}
+        self.event2_config = {"accel_z_threshold" : 0.4, "vehicle_accel_threshold" : -0.2, "accel_window" : 20}
+        self.data_push = True
     
     async def run_get_data(self):
         while True:
@@ -95,7 +96,8 @@ class SampleApp(VehicleApp):
                 self.event_thread = threading.Thread(target=self.calculate_event, args=(data_dict,))
                 self.event_thread.start()
             if self.aws_connector.status:
-                self.aws_connector.publish_gps_accel_message(data_dict)
+                if self.data_push:
+                    self.aws_connector.publish_gps_accel_message(data_dict)
             if self.event_thread:
                 self.event_thread.join()
             await asyncio.sleep(0.02)
@@ -247,6 +249,10 @@ class SampleApp(VehicleApp):
                     self.event2_run = True
                 if json_payload["status"] == "stop":
                     self.event2_run = False
+                if json_payload["cloud"] == "start":
+                    self.data_push = True
+                if json_payload["cloud"] == "stop":
+                    self.data_push = False
             if topic = "sdv/event2_config":
                 json_payload = json.loads(payload)
                 self.event2_config["accel_z_threshold"] = json_payload["accel_z_threshold"]
