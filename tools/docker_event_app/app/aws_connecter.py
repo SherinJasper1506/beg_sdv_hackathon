@@ -5,13 +5,14 @@ import threading
 
 import paho.mqtt.client as mqtt
 
-THING_NAME = "rcu_test"
-SUBSCRIBE_TOPIC = "test/data"
+THING_NAME = "ec2_machine"
+SUBSCRIBE_TOPIC = "test/data1"
+SUBSCRIBE_TOPIC_2 = "sdv/combined"
 PUBLISH_TEST_EVENT1_TOPIC = "sdv/event1"
 IOT_CORE_ENDPOINT = "a1k4mu7a9eqjbq-ats.iot.eu-central-1.amazonaws.com"
-CA_CERT = "./certs/AmazonRootCA1.pem"
-CERT_FILE = "./certs/cert_file.pem.crt"
-PRIVATE_KEY = "./certs/private_file.pem.key"
+CA_CERT = "/home/ec2-user/app/docker_event_app/app/certs/AmazonRootCA1.pem"
+CERT_FILE = "/home/ec2-user/app/docker_event_app/app/certs/cert_file.pem.crt"
+PRIVATE_KEY = "/home/ec2-user/app/docker_event_app/app/certs/private_file.pem.key"
 
 
 class AwsConnector:
@@ -45,17 +46,18 @@ class AwsConnector:
     def on_connect(self, mqtt_client, userdata, flags, rc, properties=None):
         print("connected to endpoint with result code", rc)
         mqtt_client.is_connected = True
-        mqtt_client.publish(
-            PUBLISH_TEST_EVENT1_TOPIC,
-            payload=json.dumps(
-                {
-                    "cmd": "init",
-                }
-            ),
-        )
+#        mqtt_client.publish(
+#            PUBLISH_TEST_EVENT1_TOPIC,
+#            payload=json.dumps(
+#                {
+#                    "cmd": "init",
+#                }
+#            ),
+#        )
         print("subscribing to topic: ", SUBSCRIBE_TOPIC)
         self.status = True
         mqtt_client.subscribe(SUBSCRIBE_TOPIC, qos=0, options=None, properties=None)
+        mqtt_client.subscribe(SUBSCRIBE_TOPIC_2, qos=0, options=None, properties=None)
         self.mqtt_client = mqtt_client
 
     def on_disconnect(self, mqtt_client, userdata, rc):
@@ -76,5 +78,3 @@ class AwsConnector:
         self.mqtt_client.publish(
                 topic=PUBLISH_TEST_EVENT1_TOPIC,
                 payload=message_json)
-
-# aws_connector = AwsConnector()
