@@ -65,6 +65,7 @@ class AwsConnector:
         mqtt_client.subscribe(SUBSCRIBE_TOPIC_test, qos=0, options=None, properties=None)
         mqtt_client.subscribe(SUBSCRIBE_TOPIC_event_2, qos=0, options=None, properties=None)
         mqtt_client.subscribe(SUBSCRIBE_TOPIC_event_2_config, qos=0, options=None, properties=None)
+        mqtt_client.subscribe(SUBSCRIBE_TOPIC_IMMO, qos=0, options=None, properties=None)
         self.mqtt_client = mqtt_client
 
     def on_disconnect(self, mqtt_client, userdata, rc):
