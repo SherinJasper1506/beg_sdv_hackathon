@@ -7,7 +7,7 @@ import paho.mqtt.client as mqtt
 
 THING_NAME = "rcu_lab_2"
 SUBSCRIBE_TOPIC = "downloadStatus/" + THING_NAME + "/req"
-PUBLISH_TOPIC = "test/data2"
+PUBLISH_TOPIC = "sdv/combined"
 IOT_CORE_ENDPOINT = "a1k4mu7a9eqjbq-ats.iot.eu-central-1.amazonaws.com"
 CA_CERT = "./certs/AmazonRootCA1.pem"
 CERT_FILE = "./certs/cert_file.pem.crt"
@@ -95,7 +95,7 @@ class AwsConnector:
                 "vehicle_wh_r_r": vehicle_wh_r_r,
                 "vehicle_eng_speed": vehicle_eng_speed,
                 "vehicle_speed": vehicle_speed,
-                "manual_event": manual_event,
+                "event1": manual_event,
                 "hostname": "rcu_lab"
             }, indent=2
         )

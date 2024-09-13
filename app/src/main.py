@@ -108,7 +108,7 @@ class SampleApp(VehicleApp):
         if  max_val - min_val < self.event2_config.get("accel_z_threshold"):
             return
         vehicle_accel = self.get_vehicle_accel(self.vehicle_speed_avg_arr)
-        if vehicle_accel > -self.event2_config.get("vehicle_accel_threshold")::
+        if vehicle_accel > -self.event2_config.get("vehicle_accel_threshold"):
             return
         is_vehicle_wh_speed_diff = max(self.vehicle_wh_diff)
         if not is_vehicle_wh_speed_diff:
@@ -253,12 +253,15 @@ class SampleApp(VehicleApp):
                     self.data_push = True
                 if json_payload["cloud"] == "stop":
                     self.data_push = False
-            if topic = "sdv/event2_config":
+            if topic == "sdv/event2_config":
                 json_payload = json.loads(payload)
                 self.event2_config["accel_z_threshold"] = json_payload["accel_z_threshold"]
                 self.event2_config["vehicle_accel_threshold"] = json_payload["vehicle_accel_threshold"]
                 self.event2_config["accel_window"] = json_payload["vehicle_wh_speed_diff"]
                 print(self.event2_config)
+            if topic == AwsConnector.SUBSCRIBE_TOPIC_IMMO:
+                json_payload = json.loads(payload)
+                print(json_payload)
         except Exception as e:
             print("Error in on_message")
 
