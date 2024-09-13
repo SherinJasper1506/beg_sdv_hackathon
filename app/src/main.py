@@ -76,9 +76,15 @@ class SampleApp(VehicleApp):
         self.event2_run = False
         self.event2_config = {"accel_z_threshold" : 0.4, "vehicle_accel_threshold" : -0.2, "accel_window" : 20}
         self.data_push = True
+        # Check further
+        self.immo_data_push = False
+        self.immo_state = ""
     
     async def run_get_data(self):
         while True:
+            if self.immo_data_push:
+                await asyncio.create_task(self.publish_event(IMMO_ECU_TOPIC, self.immo_state))
+                self.immo_data_push = False
             accel_lat_obj = await self.Vehicle.Acceleration.Lateral.get()
             accel_long_obj = await self.Vehicle.Acceleration.Longitudinal.get()
             accel_vert_obj = await self.Vehicle.Acceleration.Vertical.get()
@@ -279,9 +285,12 @@ class SampleApp(VehicleApp):
                 json_payload = json.loads(payload)
                 print(json_payload)
                 if json_payload["locked"] == False:
-                    await self.publish_event(IMMO_ECU_TOPIC,'Unlock')
+                    # asyncio.create_task(self.publish_event(IMMO_ECU_TOPIC,'Unlock'))
+                    self.immo_state = 'Unlock'
                 if json_payload["locked"] == True:
-                    await self.publish_event(IMMO_ECU_TOPIC,'Lock'):
+                    self.immo_state = 'Lock'
+                    # asyncio.create_task(self.publish_event(IMMO_ECU_TOPIC,'Lock'))
+                self.immo_data_push = True
         except Exception as e:
             print("Error in on_message")
             print(e)

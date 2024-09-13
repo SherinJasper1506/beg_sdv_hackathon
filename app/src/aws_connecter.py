@@ -99,6 +99,7 @@ class AwsConnector:
 
     def publish_immo_message(self, data_dict):
         print("immo message")
+        data_dict["hostname"] = THING_NAME
         message_json = json.dumps(data_dict, indent=2)
         self.mqtt_client.publish(
                 topic=PUBLISH_IMMO_TOPIC,
