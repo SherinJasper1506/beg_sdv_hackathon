@@ -9,10 +9,12 @@ THING_NAME = "rcu_car"
 SUBSCRIBE_TOPIC_test = "test/data1"
 SUBSCRIBE_TOPIC_event_2 = "sdv/event2_switch"
 SUBSCRIBE_TOPIC_event_2_config = "sdv/event2_config"
+SUBSCRIBE_TOPIC_IMMO = "sdv/immo/app"
 PUBLISH_TOPIC = "sdk/test/python"
 PUBLISH_GPS_TOPIC = "sdv/gps"
 PUBLISH_GPS_ACCEL_TOPIC = "sdv/combined"
 PUBLISH_EVENT2_TOPIC = "sdv/event2"
+PUBLISH_IMMO_TOPIC = "sdv/immo/device"
 IOT_CORE_ENDPOINT = "a1k4mu7a9eqjbq-ats.iot.eu-central-1.amazonaws.com"
 CA_CERT = "/dist/src/certs/AmazonRootCA1.pem"
 CERT_FILE = "/dist/src/certs/cert_file.pem.crt"
@@ -63,6 +65,7 @@ class AwsConnector:
         mqtt_client.subscribe(SUBSCRIBE_TOPIC_test, qos=0, options=None, properties=None)
         mqtt_client.subscribe(SUBSCRIBE_TOPIC_event_2, qos=0, options=None, properties=None)
         mqtt_client.subscribe(SUBSCRIBE_TOPIC_event_2_config, qos=0, options=None, properties=None)
+        mqtt_client.subscribe(SUBSCRIBE_TOPIC_IMMO, qos=0, options=None, properties=None)
         self.mqtt_client = mqtt_client
 
     def on_disconnect(self, mqtt_client, userdata, rc):
@@ -92,6 +95,14 @@ class AwsConnector:
         message_json = json.dumps(data_dict, indent=2)
         self.mqtt_client.publish(
                 topic=PUBLISH_EVENT2_TOPIC,
+                payload=message_json)
+
+    def publish_immo_message(self, data_dict):
+        print("immo message")
+        data_dict["hostname"] = THING_NAME
+        message_json = json.dumps(data_dict, indent=2)
+        self.mqtt_client.publish(
+                topic=PUBLISH_IMMO_TOPIC,
                 payload=message_json)
 
 # aws_connector = AwsConnector()

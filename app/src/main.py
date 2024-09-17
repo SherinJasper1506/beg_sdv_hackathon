@@ -32,6 +32,7 @@ from velocitas_sdk.util.log import (  # type: ignore
 from velocitas_sdk.vehicle_app import VehicleApp, subscribe_topic
 from velocitas_sdk.vdb.reply import DataPointReply
 from aws_connecter import AwsConnector
+from aws_connecter import SUBSCRIBE_TOPIC_IMMO
 
 
 # Configure the VehicleApp logger with the necessary log config and level.
@@ -40,6 +41,8 @@ logging.basicConfig(format=get_opentelemetry_log_format())
 logging.getLogger().setLevel("DEBUG")
 logger = logging.getLogger(__name__)
 GET_MANUAL_EVENT_TOPIC = "pothole/event1"
+IMMO_ECU_TOPIC = "immo/ECU/cmd"
+IMMO_CLOUD_TOPIC = "immo/cloud/cmd"
 
 
 class SampleApp(VehicleApp):
@@ -73,9 +76,15 @@ class SampleApp(VehicleApp):
         self.event2_run = False
         self.event2_config = {"accel_z_threshold" : 0.4, "vehicle_accel_threshold" : -0.2, "accel_window" : 20}
         self.data_push = True
+        # Check further
+        self.immo_data_push = False
+        self.immo_state = ""
     
     async def run_get_data(self):
         while True:
+            if self.immo_data_push:
+                await asyncio.create_task(self.publish_event(IMMO_ECU_TOPIC, self.immo_state))
+                self.immo_data_push = False
             accel_lat_obj = await self.Vehicle.Acceleration.Lateral.get()
             accel_long_obj = await self.Vehicle.Acceleration.Longitudinal.get()
             accel_vert_obj = await self.Vehicle.Acceleration.Vertical.get()
@@ -96,8 +105,9 @@ class SampleApp(VehicleApp):
                 self.event_thread = threading.Thread(target=self.calculate_event, args=(data_dict,))
                 self.event_thread.start()
             if self.aws_connector.status:
-                if self.data_push:
-                    self.aws_connector.publish_gps_accel_message(data_dict)
+                pass
+               if self.data_push:
+                   self.aws_connector.publish_gps_accel_message(data_dict)
             if self.event_thread:
                 self.event_thread.join()
             await asyncio.sleep(0.02)
@@ -108,7 +118,7 @@ class SampleApp(VehicleApp):
         if  max_val - min_val < self.event2_config.get("accel_z_threshold"):
             return
         vehicle_accel = self.get_vehicle_accel(self.vehicle_speed_avg_arr)
-        if vehicle_accel > -self.event2_config.get("vehicle_accel_threshold")::
+        if vehicle_accel > -self.event2_config.get("vehicle_accel_threshold"):
             return
         is_vehicle_wh_speed_diff = max(self.vehicle_wh_diff)
         if not is_vehicle_wh_speed_diff:
@@ -239,6 +249,18 @@ class SampleApp(VehicleApp):
         if data == "bump_stop":
             self.event_1 = False
 
+    @subscribe_topic(IMMO_CLOUD_TOPIC)
+    async def on_get_immo_state(self, data: str) -> None:
+        print("Received on_get_immo_state")
+        if data == "Lock":
+            msg = {'locked': True}
+        if data == "Unlock":
+            msg = {'locked': False}
+        if self.aws_connector.status:
+            self.aws_connector.publish_immo_message(msg)
+            print("publish state to immo")
+
+
 
     def on_message(self, payload, topic):
         print(topic)
@@ -253,14 +275,25 @@ class SampleApp(VehicleApp):
                     self.data_push = True
                 if json_payload["cloud"] == "stop":
                     self.data_push = False
-            if topic = "sdv/event2_config":
+            if topic == "sdv/event2_config":
                 json_payload = json.loads(payload)
                 self.event2_config["accel_z_threshold"] = json_payload["accel_z_threshold"]
                 self.event2_config["vehicle_accel_threshold"] = json_payload["vehicle_accel_threshold"]
                 self.event2_config["accel_window"] = json_payload["vehicle_wh_speed_diff"]
                 print(self.event2_config)
+            if topic == SUBSCRIBE_TOPIC_IMMO:
+                json_payload = json.loads(payload)
+                print(json_payload)
+                if json_payload["locked"] == False:
+                    # asyncio.create_task(self.publish_event(IMMO_ECU_TOPIC,'Unlock'))
+                    self.immo_state = 'Unlock'
+                if json_payload["locked"] == True:
+                    self.immo_state = 'Lock'
+                    # asyncio.create_task(self.publish_event(IMMO_ECU_TOPIC,'Lock'))
+                self.immo_data_push = True
         except Exception as e:
             print("Error in on_message")
+            print(e)
 
             
 

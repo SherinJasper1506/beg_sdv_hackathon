@@ -1,5 +1,9 @@
 ====================== create commands ========================
+#working
 kanto-cm create --name pothole-app --network=host --t --i  --mp="/tmp:/tmp"  ghcr.io/sherinjasper1506/beg_sdv_hackathon:arm64@sha256:2d06a7019b67d23919801cf5ad321853d4437fd2417cc4917ed914230e003a30
+
+kanto-cm create --name pothole-app --network=host --t --i  --mp="/tmp:/tmp"   ghcr.io/sherinjasper1506/beg_sdv_hackathon:arm64@sha256:2f00081bc5ab2f6b833afce2fa3a4289f88c61f0ea31b74c54a0612819e991e0
+
 
 kanto-cm create --name gps-data --network=host --t --i  --mp="/tmp:/tmp"  --devices=/dev/ttymxc3:/dev/ttymxc3  --devices=/dev/owa5x_gpio:/dev/owa5x_gpio ghcr.io/ronit-wilson-r/gps-accel-data:arm64@sha256:4689f6a69f597f4a2450c7cc3e08a0f626227bfe8af3e23e95b5a472b7d08121
 
@@ -11,7 +15,13 @@ old ids: a77479cfe3df75bd93d96a2dd674bc3115410a19dfe607767d300af28dd157dc
 
 kanto-cm create --name  can-provider-1  --network=host --t --i  --mp="/tmp:/tmp"  --devices=/dev/ttymxc3:/dev/ttymxc3  ghcr.io/ronit-wilson-r/kuksa-can-provider-data:arm64
 
-kanto-cm create --name event1 --network=host --t --i  --mp="/tmp:/tmp"  --devices=/dev/ttymxc3:/dev/ttymxc3  --devices=/dev/owa5x_gpio:/dev/owa5x_gpio ghcr.io/ronit-wilson-r/gps-accel-data:arm64@sha256:4a143a4abe004bdd562cf661769d90d14b3e5708ffb8422ae0633e023ada3e98
+Paritally working
+# kanto-cm create --name event1 --network=host --t --i  --mp="/tmp:/tmp"  --devices=/dev/ttymxc3:/dev/ttymxc3  --devices=/dev/owa5x_gpio:/dev/owa5x_gpio ghcr.io/ronit-wilson-r/gps-accel-data:arm64@sha256:4a143a4abe004bdd562cf661769d90d14b3e5708ffb8422ae0633e023ada3e98
+
+# kanto-cm create --name event1 --network=host --t --i  --mp="/tmp:/tmp"  --devices=/dev/ttymxc3:/dev/ttymxc3  --devices=/dev/owa5x_gpio:/dev/owa5x_gpio ghcr.io/ronit-wilson-r/gps-accel-data:arm64@sha256:baa6699d39eb5775f7841c7360ef9308f50615beef82d38ca1695e28f97f18b5
+
+
+
 
 ====================== start commands ========================
 
