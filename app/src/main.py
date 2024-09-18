@@ -106,7 +106,7 @@ class SampleApp(VehicleApp):
                 self.event_thread.start()
             if self.aws_connector.status:
                 pass
-               if self.data_push:
+                if self.data_push:
                    self.aws_connector.publish_gps_accel_message(data_dict)
             if self.event_thread:
                 self.event_thread.join()
