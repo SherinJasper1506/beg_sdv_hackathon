@@ -20,7 +20,7 @@ ARG TARGETARCH
 
 RUN apt-get update && apt-get install -y python3-dev \
     # && apt-get install -y binutils \
-    && apt-get install -y bash \
+    # && apt-get install -y bash \
     && apt-get install -y pip
 
 COPY ./.velocitas.json /workspace/.velocitas_org.json
@@ -30,14 +30,14 @@ COPY ./app /workspace/app
 # filter this without manual jq intervention...
 RUN cat ./workspace/.velocitas_org.json | jq 'del(.packages[] | select(.name != "devenv-devcontainer-setup"))' > ./workspace/.velocitas.json
 
-# Remove this installation for Arm64 once staticx has a prebuilt wheel for Arm64
-RUN /bin/bash -c 'set -ex && \
-    ARCH=`uname -m` && \
-    if [ "$ARCH" == "aarch64" ]; then \
-    echo "ARM64" && \
-    apt-get install -y gcc && \
-    pip3 install --no-cache-dir scons; \
-    fi'
+# # Remove this installation for Arm64 once staticx has a prebuilt wheel for Arm64
+# RUN /bin/bash -c 'set -ex && \
+#     ARCH=`uname -m` && \
+#     if [ "$ARCH" == "aarch64" ]; then \
+#     echo "ARM64" && \
+#     apt-get install -y gcc && \
+#     pip3 install --no-cache-dir scons; \
+#     fi'
 
 # RUN pip3 install --no-cache-dir pyinstaller==5.9.0 \
 #     && pip3 install --no-cache-dir patchelf==0.17.0.0 \
@@ -45,8 +45,8 @@ RUN /bin/bash -c 'set -ex && \
 #     && pip3 install --no-cache-dir -r ./workspace/app/requirements.txt \
 #     && pip3 install --no-cache-dir -r ./workspace/app/requirements-links.txt
 
-RUN pip3 install --no-cache-dir -r ./workspace/app/requirements.txt \
-    && pip3 install --no-cache-dir -r ./workspace/app/requirements-links.txt
+# RUN pip3 install --no-cache-dir -r ./workspace/app/requirements.txt \
+#     && pip3 install --no-cache-dir -r ./workspace/app/requirements-links.txt
 
 WORKDIR /workspace
 
@@ -73,5 +73,5 @@ RUN rm -r /workspace
 ENV SDV_MIDDLEWARE_TYPE="native"
 ENV SDV_VEHICLEDATABROKER_ADDRESS="grpc://localhost:55555"
 
-CMD ["bash"]
-# CMD ["python3","/dist/src/main.py"]
+# CMD ["bash"]
+CMD ["python3","/dist/src/main.py"]
