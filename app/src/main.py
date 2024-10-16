@@ -16,6 +16,7 @@
 
 
 from sdv_model import Vehicle
+
 # import asyncio
 # import json
 # import logging
@@ -25,30 +26,43 @@ import time
 vehicle = Vehicle()
 
 driver_profiles = {
-    "Sijil": {"name": "Sijil", "seat_position": 9, "fan_speed": 90, "temp" :22},
-    "Raj": {"name": "Rajkumar", "seat_position": 6, "fan_speed": 60,"temp" :21},
-    "Sherin": {"name": "Sherin", "seat_position": 5, "fan_speed": 50,"temp" :23},
+    "Sijil": {"name": "Sijil", "seat_position": 9, "fan_speed": 90, "temp": 22},
+    "Raj": {"name": "Rajkumar", "seat_position": 6, "fan_speed": 60, "temp": 21},
+    "Sherin": {"name": "Sherin", "seat_position": 5, "fan_speed": 50, "temp": 23},
 }
 
 # print = plugins.Terminal.print
 # previous_status = False
 SLEEP_TIME = 5
-print("Started.....")
-while True:
-    driver_id = await vehicle.Driver.Identifier.Subject.get()
-    if driver_id == "Unknown":
-        print(f"Driver Profile ID {driver_id}")
-        await vehicle.Cabin.Seat.Row1.DriverSide.Position.set(0)
-        await vehicle.Cabin.HVAC.Station.Row1.Driver.FanSpeed.set(0)
-        await vehicle.Cabin.HVAC.Station.Row1.Driver.Temperature.set(0)
-    else:
-        print(f"Driver Profile ID {driver_id}")
-        await vehicle.Cabin.Seat.Row1.DriverSide.Position.set(profile['seat_position'])
-        await vehicle.Cabin.HVAC.Station.Row1.Driver.FanSpeed.set(profile['fan_speed'])
-        await vehicle.Cabin.HVAC.Station.Row1.Driver.Temperature.set(profile['temp'])
-    time.sleep(SLEEP_TIME)
-    
-print("Stopping app")
+
+
+class SampleApp:
+
+    async def app_start():
+        print("Started.....")
+
+        while True:
+            driver_id = await vehicle.Driver.Identifier.Subject.get()
+            if driver_id == "Unknown":
+                print(f"Driver Profile ID {driver_id}")
+                await vehicle.Cabin.Seat.Row1.DriverSide.Position.set(0)
+                await vehicle.Cabin.HVAC.Station.Row1.Driver.FanSpeed.set(0)
+                await vehicle.Cabin.HVAC.Station.Row1.Driver.Temperature.set(0)
+            else:
+                print(f"Driver Profile ID {driver_id}")
+                await vehicle.Cabin.Seat.Row1.DriverSide.Position.set(9)
+                await vehicle.Cabin.HVAC.Station.Row1.Driver.FanSpeed.set(90)
+                await vehicle.Cabin.HVAC.Station.Row1.Driver.Temperature.set(21)
+            time.sleep(SLEEP_TIME)
+        print("Stopping app")
+
+async def main():
+    """Main function"""
+    # logger.info("Starting SampleApp...")
+    # Constructing SampleApp and running it.
+    vehicle_app = SampleApp(vehicle)
+    await vehicle_app.run()
+
 
 # #await vehicle.ChildDetected.set(False)
 
@@ -78,7 +92,7 @@ print("Stopping app")
 # #             await vehicle.Cabin.Seat.Row1.DriverSide.Position.set(0)
 # #             await vehicle.Cabin.HVAC.Station.Row1.Driver.FanSpeed.set(0)
 # #             await vehicle.Cabin.HVAC.Station.Row1.Driver.Temperature.set(0)
-        
+
 
 # from vehicle import Vehicle, vehicle  # type: ignore
 # from velocitas_sdk.util.log import (  # type: ignore
@@ -136,7 +150,7 @@ print("Stopping app")
 #         # Check further
 #         self.immo_data_push = False
 #         self.immo_state = ""
-    
+
 #     async def run_get_data(self):
 #         while True:
 #             if self.immo_data_push:
@@ -217,7 +231,7 @@ print("Stopping app")
 #             self.vehicle_wh_diff.append(0)
 #         else:
 #             self.vehicle_wh_diff.append(1)
-        
+
 #         if len(self.vehicle_speed_arr) > self.event2_config["accel_window"]:
 #             self.vehicle_speed_arr.pop(0)
 #         if len(self.vehicle_speed_avg_arr) > 2:
@@ -225,7 +239,7 @@ print("Stopping app")
 #         if len(self._accel_z_arr) > 5:
 #             self._accel_z_arr.pop(0)
 #         if len(self.vehicle_wh_diff) > 3:
-#             self.vehicle_wh_diff.pop(0)   
+#             self.vehicle_wh_diff.pop(0)
 
 #     def find_min_max(self, arr):
 #         if len(arr) < 5:
@@ -233,7 +247,7 @@ print("Stopping app")
 #         min_val = min(arr)
 #         max_val = max(arr)
 #         return min_val, max_val
-    
+
 #     def get_avg(self, arr):
 #         if len(arr) == 0:
 #             return 0
@@ -317,7 +331,6 @@ print("Stopping app")
 #             print("publish state to immo")
 
 
-
 #     def on_message(self, payload, topic):
 #         print(topic)
 #         try:
@@ -351,7 +364,6 @@ print("Stopping app")
 #             print("Error in on_message")
 #             print(e)
 
-            
 
 # async def main():
 #     """Main function"""
@@ -369,5 +381,3 @@ print("Stopping app")
 
 # export SDV_MIDDLEWARE_TYPE="native"
 # export SDV_VEHICLEDATABROKER_ADDRESS="grpc://localhost:55555"
-
-
