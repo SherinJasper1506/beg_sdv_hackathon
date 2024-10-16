@@ -6,6 +6,17 @@ import time
 import subprocess
 import sys
 
+from kuksa_client.grpc import VSSClient
+from kuksa_client.grpc import Datapoint
+
+def post_to_vss_client(driver_name):
+    with VSSClient('127.0.0.1', 55555) as client:
+        client.set_current_values({
+        'Vehicle.Driver.Identifier.Subject': Datapoint(driver_name),
+        })
+    print("Posted to VSS")
+
+
 def text_to_speech(text):
     shell_cmd_espeak_open = subprocess.Popen(f"espeak '{text}'", shell=True)
     shell_cmd_espeak_return = shell_cmd_espeak_open.wait()
@@ -88,6 +99,7 @@ while True:
             face_names.append(name)
 
     process_this_frame = not process_this_frame
+    post_to_vss_client(name)
 
     # Display the results
     for (top, right, bottom, left), name in zip(face_locations, face_names):

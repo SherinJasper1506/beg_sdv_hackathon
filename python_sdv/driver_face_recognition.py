@@ -6,6 +6,18 @@ import time
 import subprocess
 import sys
 
+from kuksa_client.grpc import VSSClient
+from kuksa_client.grpc import Datapoint
+
+from deepface import DeepFace
+
+def post_to_vss_client(driver_name):
+    with VSSClient('127.0.0.1', 55555) as client:
+        client.set_current_values({
+        'Vehicle.Driver.Identifier.Subject': Datapoint(driver_name),
+        })
+    print("Driver Identified and posted")
+
 def text_to_speech(text):
     shell_cmd_espeak_open = subprocess.Popen(f"espeak '{text}'", shell=True)
     shell_cmd_espeak_return = shell_cmd_espeak_open.wait()
@@ -56,7 +68,6 @@ def highlightFace(net, frame, conf_threshold=0.7):
             cv2.rectangle(frameOpencvDnn, (x1,y1), (x2,y2), (0,255,0), int(round(frameHeight/150)), 8)
     return frameOpencvDnn,faceBoxes
 
-from deepface import DeepFace
 # Load face cascade classifier
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
@@ -65,11 +76,11 @@ face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_fronta
 video_capture = cv2.VideoCapture(0)
 
 # Load a sample picture and learn how to recognize it.
-sherin_image = face_recognition.load_image_file("Sherin.png")
+sherin_image = face_recognition.load_image_file("driver_images/Sherin.png")
 sherin_face_encoding = face_recognition.face_encodings(sherin_image)[0]
 
 # Load a second sample picture and learn how to recognize it.
-sijil_image = face_recognition.load_image_file("Sijil.png")
+sijil_image = face_recognition.load_image_file("driver_images/Sijil.png")
 sijil_face_encoding = face_recognition.face_encodings(sijil_image)[0]
 
 # Create arrays of known face encodings and their names
@@ -126,6 +137,7 @@ while True:
                 name = known_face_names[best_match_index]
 
             face_names.append(name)
+            post_to_vss_client(name)
     
         resultImg,faceBoxes=highlightFace(faceNet,frame)
         # if not faceBoxes:

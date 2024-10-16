@@ -1,0 +1,22 @@
+@startuml Sdv Driver profile Application
+
+rectangle "Driver Profile Identifier Application"{
+
+    rectangle "Drive Face Recognition App" as driver_identifier_app
+    rectangle "Kuksa DataBroker" as DataBroker
+    rectangle "Signals"{
+        rectangle "Profile" as DriverName
+        rectangle "Seat Position" as SeatPosition
+        rectangle "Temperature" as Temperature
+        rectangle "FanSpeed" as FanSpeed
+        
+        SeatPosition -[hidden]up-> DriverName
+        Temperature -[hidden]up-> SeatPosition
+        FanSpeed -[hidden]up-> Temperature
+    }
+
+    driver_identifier_app <-right-> DataBroker
+    DataBroker <-right-> Signals
+}
+
+@enduml

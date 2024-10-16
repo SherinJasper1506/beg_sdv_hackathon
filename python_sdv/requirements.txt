@@ -3,3 +3,4 @@ deepface
 tf_keras
 numpy
 face_recognition
+kuksa-client
