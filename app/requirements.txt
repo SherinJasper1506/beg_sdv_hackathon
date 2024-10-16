@@ -48,3 +48,8 @@ typing-extensions==4.8.0
     # via dapr
 yarl==1.9.2
     # via aiohttp
+opencv-python
+deepface
+tf_keras
+numpy
+face_recognition
