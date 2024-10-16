@@ -9,10 +9,13 @@ rectangle "Driver Profile Identifier Application"{
         rectangle "Seat Position" as SeatPosition
         rectangle "Temperature" as Temperature
         rectangle "FanSpeed" as FanSpeed
+        rectangle "Child Detected" as ChildDetected
         
         SeatPosition -[hidden]up-> DriverName
         Temperature -[hidden]up-> SeatPosition
         FanSpeed -[hidden]up-> Temperature
+        ChildDetected -[hidden]up-> FanSpeed
+
     }
 
     driver_identifier_app <-right-> DataBroker

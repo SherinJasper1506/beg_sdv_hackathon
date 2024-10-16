@@ -11,28 +11,6 @@ from kuksa_client.grpc import Datapoint
 
 from deepface import DeepFace
 
-def post_to_vss_client(driver_name):
-    with VSSClient('127.0.0.1', 55555) as client:
-        client.set_current_values({
-        'Vehicle.Driver.Identifier.Subject': Datapoint(driver_name),
-        })
-    print("Driver Identified and posted")
-
-def text_to_speech(text):
-    shell_cmd_espeak_open = subprocess.Popen(f"espeak '{text}'", shell=True)
-    shell_cmd_espeak_return = shell_cmd_espeak_open.wait()
-    if (shell_cmd_espeak_return):
-        print("\nERROR: failure in processing Shell Command")
-
-# This is a demo of running face recognition on live video from your webcam. It's a little more complicated than the
-# other example, but it includes some basic performance tweaks to make things run a lot faster:
-#   1. Process each video frame at 1/4 resolution (though still display it at full resolution)
-#   2. Only detect faces in every other frame of video.
-
-# PLEASE NOTE: This example requires OpenCV (the `cv2` library) to be installed only to read from your webcam.
-# OpenCV is *not* required to use the face_recognition library. It's only required if you want to run this
-# specific demo. If you have trouble installing it, try any of the other demos that don't require it instead.
-
 faceProto="opencv_face_detector.pbtxt"
 faceModel="opencv_face_detector_uint8.pb"
 ageProto="age_deploy.prototxt"
@@ -47,6 +25,19 @@ genderList=['Male','Female']
 faceNet=cv2.dnn.readNet(faceModel,faceProto)
 ageNet=cv2.dnn.readNet(ageModel,ageProto)
 genderNet=cv2.dnn.readNet(genderModel,genderProto)
+
+def post_to_vss_client(driver_name):
+    with VSSClient('127.0.0.1', 55555) as client:
+        client.set_current_values({
+        'Vehicle.Driver.Identifier.Subject': Datapoint(driver_name),
+        })
+    print("Driver Identified and posted")
+
+def text_to_speech(text):
+    shell_cmd_espeak_open = subprocess.Popen(f"espeak '{text}'", shell=True)
+    shell_cmd_espeak_return = shell_cmd_espeak_open.wait()
+    if (shell_cmd_espeak_return):
+        print("\nERROR: failure in processing Shell Command")
 
 def highlightFace(net, frame, conf_threshold=0.7):
     frameOpencvDnn=frame.copy()
@@ -140,7 +131,6 @@ while True:
             post_to_vss_client(name)
     
         resultImg,faceBoxes=highlightFace(faceNet,frame)
-        # if not faceBoxes:
 
         for faceBox in faceBoxes:
             face=frame[max(0,faceBox[1]-padding):
