@@ -106,6 +106,6 @@ jobs:
         with:
           context: .
           file: ./app/Dockerfile
-          tags: ghcr.io/sherinjasper1506/beg_sdv_hackathon:arm64
+          tags: ghcr.io/sherinjasper1506/beg_sdv_hackathon_driver_ver_1:arm64
           push: true
           platforms: "linux/arm64"
