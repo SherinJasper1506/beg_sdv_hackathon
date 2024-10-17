@@ -1,25 +1,45 @@
 @startuml Sdv Driver profile Application
 
+skinparam SequenceMessageAlignment center
+
 rectangle "Driver Profile Identifier Application"{
 
-    rectangle "Drive Face Recognition App" as driver_identifier_app
-    rectangle "Kuksa DataBroker" as DataBroker
-    rectangle "Signals"{
-        rectangle "Profile" as DriverName
-        rectangle "Seat Position" as SeatPosition
-        rectangle "Temperature" as Temperature
-        rectangle "FanSpeed" as FanSpeed
-        rectangle "Child Detected" as ChildDetected
-        
-        SeatPosition -[hidden]up-> DriverName
-        Temperature -[hidden]up-> SeatPosition
-        FanSpeed -[hidden]up-> Temperature
-        ChildDetected -[hidden]up-> FanSpeed
 
+
+    node "Drive Face Recognition App" as driver_identifier_app{
+        rectangle "Face Image Recognition" as image
+        rectangle "Age Detection" as age
+        rectangle "Emotion analysis" as emotion
+
+        image -[hidden]down-> age
+        age -[hidden]down-> emotion
     }
+    node "Docker/Canto" as Container{
+        node "Kuksa DataBroker" as DataBroker
 
-    driver_identifier_app <-right-> DataBroker
-    DataBroker <-right-> Signals
+        rectangle "Driver Profiles Setter" as signals{
+            rectangle "Profile" as DriverName
+            rectangle "Seat Position" as SeatPosition
+            rectangle "Temperature" as Temperature
+            rectangle "FanSpeed" as FanSpeed
+            rectangle "Child Detected" as ChildDetected
+
+            SeatPosition -[hidden]up-> DriverName
+            Temperature -[hidden]up-> SeatPosition
+            FanSpeed -[hidden]up-> Temperature
+            ChildDetected -[hidden]up-> FanSpeed
+
+        }
+    }
+    driver_identifier_app -[hidden]left-> DataBroker
+    DataBroker -[hidden]left-> signals
+    driver_identifier_app -[hidden]down-> signals
+    signals -[hidden]down-> DataBroker
+    driver_identifier_app -->DataBroker
+    DataBroker <--> signals
+
+
 }
+
 
 @enduml

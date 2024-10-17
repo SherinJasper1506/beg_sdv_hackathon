@@ -15,13 +15,20 @@
 # syntax=docker/dockerfile:1.2
 
 # Build stage, to create the executable
+
 FROM --platform=$TARGETPLATFORM ghcr.io/eclipse-velocitas/devcontainer-base-images/python:v0.2 as builder
 ARG TARGETARCH
 
-RUN apt-get update && apt-get install -y python3-dev \
+# Environment="HTTPS_PROXY=http://127.0.0.1:3128/" "HTTP_PROXY=http://127.0.0.1:3128/" "NO_PROXY=localhost,127.0.0.1,bosch.com"
+
+# ENV http_proxy="http://172.17.0.1:3128"
+# ENV https_proxy="http://172.17.0.1:3128"
+
+RUN apt-get update && apt-get upgrade -y && apt-get install -y python3-dev  && apt-get install -y pip
+    # && apt-get install -y binutils 
     # && apt-get install -y binutils \
     # && apt-get install -y bash \
-    && apt-get install -y pip
+    # && apt-get install -y pip
 
 COPY ./.velocitas.json /workspace/.velocitas_org.json
 COPY ./app /workspace/app
@@ -47,6 +54,17 @@ RUN cat ./workspace/.velocitas_org.json | jq 'del(.packages[] | select(.name != 
 
 # RUN pip3 install --no-cache-dir -r ./workspace/app/requirements.txt \
 #     && pip3 install --no-cache-dir -r ./workspace/app/requirements-links.txt
+
+# RUN python3 -m pip install --upgrade pip
+# RUN pip3 install opencv-python && pip3 install numpy
+# RUN pip3 install deepface
+# RUN pip3 install tf_keras
+RUN pip3 install kuksa-client
+
+# deepface
+# tf_keras
+# numpy
+# face_recognition
 
 WORKDIR /workspace
 

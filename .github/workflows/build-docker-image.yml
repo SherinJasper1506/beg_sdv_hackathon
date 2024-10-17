@@ -84,7 +84,7 @@ jobs:
         run: |
           if [ ${{ inputs.platform }} = "multiarch" ]; then
             echo "Build Multiarch"
-            echo "platforms=linux/amd64, linux/arm64,linux/x86" >> $GITHUB_OUTPUT
+            echo "platforms=linux/amd64, linux/arm64" >> $GITHUB_OUTPUT
             echo "type=oci,dest=./${{ env.APP_NAME }}.tar" >> $GITHUB_OUTPUT
           else
             echo "Build ${{inputs.platform}}"
@@ -106,6 +106,6 @@ jobs:
         with:
           context: .
           file: ./app/Dockerfile
-          tags: ghcr.io/sherinjasper1506/beg_sdv_hackathon_driver_ver_1:x86
+          tags: ghcr.io/sherinjasper1506/beg_sdv_hackathon_driver_ver_2:arm64
           push: true
-          platforms: "linux/x86"
+          platforms: "linux/arm64"
