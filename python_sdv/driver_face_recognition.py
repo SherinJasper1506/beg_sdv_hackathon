@@ -127,81 +127,59 @@ while True:
             if matches[best_match_index]:
                 name = known_face_names[best_match_index]
 
+            # Emotion Analysis
             face_names.append(name)
             post_to_vss_client(name)
-    
-        resultImg,faceBoxes=highlightFace(faceNet,frame)
-
-        for faceBox in faceBoxes:
-            face=frame[max(0,faceBox[1]-padding):
-                   min(faceBox[3]+padding,frame.shape[0]-1),max(0,faceBox[0]-padding)
-                   :min(faceBox[2]+padding, frame.shape[1]-1)]
-
-            blob=cv2.dnn.blobFromImage(face, 1.0, (227,227), MODEL_MEAN_VALUES, swapRB=False)
+            gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            rgb_frame = cv2.cvtColor(gray_frame, cv2.COLOR_GRAY2RGB)
+            faces = face_cascade.detectMultiScale(gray_frame, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+            for (x, y, w, h) in faces:
+                face_roi = rgb_frame[y:y + h, x:x + w]
+                result = DeepFace.analyze(face_roi, actions=['emotion'], enforce_detection=False)
+                emotion = result[0]['dominant_emotion']
+                cv2.putText(frame, emotion, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
+                print("Emotion analysis",emotion)
         
-            ageNet.setInput(blob)
-            agePreds=ageNet.forward()
-            age=ageList[agePreds[0].argmax()]
-            print(f'Age: {age[1:-1]} years')
-            if age[1:-1] == "0-2" or age[1:-1] == "4-6" or age[1:-1] == "8-12":
-                print("Child detected")
-                text_to_speech("Child Detected")
+            resultImg,faceBoxes=highlightFace(faceNet,frame)
+            for faceBox in faceBoxes:
+                face=frame[max(0,faceBox[1]-padding):
+                    min(faceBox[3]+padding,frame.shape[0]-1),max(0,faceBox[0]-padding)
+                    :min(faceBox[2]+padding, frame.shape[1]-1)]
+
+                blob=cv2.dnn.blobFromImage(face, 1.0, (227,227), MODEL_MEAN_VALUES, swapRB=False)
+        
+                ageNet.setInput(blob)
+                agePreds=ageNet.forward()
+                age=ageList[agePreds[0].argmax()]
+                print(f'Age: {age[1:-1]} years')
+                # if age[1:-1] == "0-2" or age[1:-1] == "4-6" or age[1:-1] == "8-12":
+                #     print("Child detected")
+                #     text_to_speech("Child Detected")
                 cv2.putText(resultImg, f'{age}', (faceBox[0], faceBox[1]-10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0,255,255), 2, cv2.LINE_AA)
         
-    # Emotion analysis
-    
-     # Convert frame to grayscale
-        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-    # Convert grayscale frame to RGB format
-        rgb_frame = cv2.cvtColor(gray_frame, cv2.COLOR_GRAY2RGB)
-
-    # Detect faces in the frame
-        faces = face_cascade.detectMultiScale(gray_frame, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
-
-        for (x, y, w, h) in faces:
-        # Extract the face ROI (Region of Interest)
-            face_roi = rgb_frame[y:y + h, x:x + w]
-
-        
-        # Perform emotion analysis on the face ROI
-            result = DeepFace.analyze(face_roi, actions=['emotion'], enforce_detection=False)
-
-        # Determine the dominant emotion
-            emotion = result[0]['dominant_emotion']
-
-        # Draw rectangle around face and label with predicted emotion
-        # cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
-            cv2.putText(frame, emotion, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
-
+    process_this_frame = not process_this_frame
     # Display the results
-        for (top, right, bottom, left), name in zip(face_locations, face_names):
+    for (top, right, bottom, left), name in zip(face_locations, face_names):
         # Scale back up face locations since the frame we detected in was scaled to 1/4 size
-            top *= 4
-            right *= 4
-            bottom *= 4
-            left *= 4
+        top *= 4
+        right *= 4
+        bottom *= 4
+        left *= 4
 
         # Draw a box around the face
-            cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+        cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
 
         # Draw a label with a name below the face
-            cv2.rectangle(
-            frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED
-            )
-            font = cv2.FONT_HERSHEY_DUPLEX
-
-            cv2.putText(frame, f'{name}',(left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
-
+        cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+        font = cv2.FONT_HERSHEY_DUPLEX
+        cv2.putText(frame, f'{name}',(left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
     # Display the resulting image
-        cv2.imshow("Video", frame)
-
+    cv2.imshow("Video", frame)
+    time.sleep(1)
+    
     # Hit 'q' on the keyboard to quit!
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
-    
-    time.sleep(2)
-    process_this_frame = not process_this_frame
    
 
 # Release handle to the webcam
